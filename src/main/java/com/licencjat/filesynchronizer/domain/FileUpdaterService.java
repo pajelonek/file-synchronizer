@@ -8,14 +8,17 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
 
 import java.util.Collections;
 
+@Service
 public class FileUpdaterService {
 
-    public HttpEntity<UpdateFilesRS> updateFilesRSCreator(UpdateFilesRQ updateFilesRQ){
-        validateHeaders();
+    public HttpEntity<UpdateFilesRS> updateFilesRSCreator(UpdateFilesRQ updateFilesRQ) {
+
         updateFiles();
+
         UpdateFilesRS updateFilesRS = new UpdateFilesRSBuilder("success").build();
 
         HttpHeaders httpHeaders = new HttpHeaders();
@@ -29,9 +32,6 @@ public class FileUpdaterService {
     }
 
     private void updateFiles() {
-    }
-
-    private void validateHeaders() {
     }
 
 }
