@@ -5,15 +5,12 @@ import com.github.fracpete.rsync4j.RSync;
 import com.licencjat.filesynchronizer.model.updatefiles.FileRQList;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Component
 public class RSyncFileUpdaterExecutor {
 
-    String source;
     List<String> sources;
-    String destination;
     List<String> destinations;
     RSync rSync = new RSync();
 
@@ -28,33 +25,20 @@ public class RSyncFileUpdaterExecutor {
             System.out.println("Exit code: " + output.getExitCode());
             if (output.getExitCode() > 0)
                 System.err.println(output.getStdErr());
-        } catch (Exception exception){
+        } catch (Exception exception) {
             System.out.println(exception.getMessage());
         }
     }
 
-
-    public RSyncFileUpdaterExecutor setSource(String source) {
-        this.source = source;
-        return this;
-    }
 
     public RSyncFileUpdaterExecutor setSource(List<String> sources) {
         this.sources = sources;
         return this;
     }
 
-    public RSyncFileUpdaterExecutor setDestination(String destination) {
-        this.destination = destination;
-        return this;
-    }
 
     public RSyncFileUpdaterExecutor setDestinations(List<String> destinations) {
         this.destinations = destinations;
-        return this;
-    }
-
-    public RSyncFileUpdaterExecutor setFileList(String fileList) {
         return this;
     }
 }

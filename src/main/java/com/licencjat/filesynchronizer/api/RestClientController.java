@@ -7,6 +7,7 @@ import com.licencjat.filesynchronizer.model.updatefiles.UpdateFilesRS;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -19,7 +20,7 @@ public class RestClientController {
     private FileUpdaterService fileUpdaterService;
 
     @PostMapping(value = "/updateFiles", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public HttpEntity<UpdateFilesRS> updateFiles(@RequestBody UpdateFilesRQ updateFilesRQ) {
+    public ResponseEntity<UpdateFilesRS> updateFiles(@RequestBody UpdateFilesRQ updateFilesRQ) {
         return fileUpdaterService.updateFilesRSCreator(updateFilesRQ);
     }
 

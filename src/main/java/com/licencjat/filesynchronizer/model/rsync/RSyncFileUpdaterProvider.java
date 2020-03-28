@@ -2,6 +2,7 @@ package com.licencjat.filesynchronizer.model.rsync;
 
 import com.licencjat.filesynchronizer.model.updatefiles.FileRQList;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -13,20 +14,24 @@ public class RSyncFileUpdaterProvider {
     @Autowired
     RSyncFileUpdaterExecutor rSyncFileUpdaterExecutor;
 
-    List<String> testSources = new ArrayList<>();
-    List<String> testDestination = new ArrayList<>();
-
+    @Value("${user.local.directory}")
+    private String userLocalDirectory;
 
     public void process(List<FileRQList> fileRQArrayList) {
-        testSources.add("C:/Users/SG0306258/OneDrive - Sabre/Desktop/testlicencjat/test1.txt");
-        testSources.add("C:/Users/SG0306258/OneDrive - Sabre/Desktop/testlicencjat/test2.txt");
+        List<String> testSources = new ArrayList<>();
+        List<String> testDestination = new ArrayList<>();
 
-        testDestination.add(fileRQArrayList.get(0).getFilePath().substring(0,58));
+
+        testDestination.add(userLocalDirectory);
+
+        fileRQArrayList.stream()
+                .map(FileRQList::getFilePath)
+                .forEach(testSources::add);
+
         if (validate(fileRQArrayList)) {
             rSyncFileUpdaterExecutor
                     .setSource(testSources)
                     .setDestinations(testDestination)
-//                    .setFileList("FileList")
                     .execute(fileRQArrayList);
         }
     }

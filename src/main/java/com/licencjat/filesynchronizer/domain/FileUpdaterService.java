@@ -11,23 +11,24 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-@Service
-public class FileUpdaterService {
+@Component
+public class FileUpdaterService implements FileUpdaterInterface {
 
     @Autowired
     RSyncFileUpdaterProvider rSyncFileUpdaterProvider;
 
-    public HttpEntity<UpdateFilesRS> updateFilesRSCreator(UpdateFilesRQ updateFilesRQ) {
+    public ResponseEntity<UpdateFilesRS> updateFilesRSCreator(UpdateFilesRQ updateFilesRQ) {
 
         List<FileRQList> fileRQList = updateFilesRQ.getFileRQList();
 
-        if(!fileRQList.isEmpty()){
+        if (!fileRQList.isEmpty()) {
             rSyncFileUpdaterProvider.process(fileRQList);
         }
 
@@ -42,9 +43,6 @@ public class FileUpdaterService {
                 updateFilesRS,
                 httpHeaders,
                 HttpStatus.OK);
-    }
-
-    private void updateFiles() {
     }
 
 }
