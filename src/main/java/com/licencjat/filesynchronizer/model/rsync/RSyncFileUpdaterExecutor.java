@@ -2,10 +2,9 @@ package com.licencjat.filesynchronizer.model.rsync;
 
 import com.github.fracpete.processoutput4j.output.CollectingProcessOutput;
 import com.github.fracpete.rsync4j.RSync;
-import com.licencjat.filesynchronizer.model.updatefiles.FileRQ;
+import com.licencjat.filesynchronizer.model.updatefiles.FileRQList;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,7 +17,7 @@ public class RSyncFileUpdaterExecutor {
     List<String> destinations;
     RSync rSync = new RSync();
 
-    public void execute(ArrayList<FileRQ> fileRQArrayList) {
+    public void execute(List<FileRQList> fileRQArrayList) {
         rSync.sources(sources)
                 .destination(destinations.get(0))
                 .recursive(true)

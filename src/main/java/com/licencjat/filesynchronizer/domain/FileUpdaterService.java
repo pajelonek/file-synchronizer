@@ -1,6 +1,6 @@
 package com.licencjat.filesynchronizer.domain;
 
-import com.licencjat.filesynchronizer.model.updatefiles.FileRQ;
+import com.licencjat.filesynchronizer.model.updatefiles.FileRQList;
 import com.licencjat.filesynchronizer.model.updatefiles.UpdateFilesRQ;
 import com.licencjat.filesynchronizer.model.updatefiles.UpdateFilesRS;
 import com.licencjat.filesynchronizer.model.updatefiles.UpdateFilesRSBuilder;
@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 @Service
 public class FileUpdaterService {
@@ -24,7 +25,7 @@ public class FileUpdaterService {
 
     public HttpEntity<UpdateFilesRS> updateFilesRSCreator(UpdateFilesRQ updateFilesRQ) {
 
-        ArrayList<FileRQ> fileRQList = updateFilesRQ.getFileRQList();
+        List<FileRQList> fileRQList = updateFilesRQ.getFileRQList();
 
         if(!fileRQList.isEmpty()){
             rSyncFileUpdaterProvider.process(fileRQList);

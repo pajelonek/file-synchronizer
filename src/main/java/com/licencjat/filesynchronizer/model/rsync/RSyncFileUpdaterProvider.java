@@ -1,6 +1,6 @@
 package com.licencjat.filesynchronizer.model.rsync;
 
-import com.licencjat.filesynchronizer.model.updatefiles.FileRQ;
+import com.licencjat.filesynchronizer.model.updatefiles.FileRQList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -17,7 +17,7 @@ public class RSyncFileUpdaterProvider {
     List<String> testDestination = new ArrayList<>();
 
 
-    public void process(ArrayList<FileRQ> fileRQArrayList) {
+    public void process(List<FileRQList> fileRQArrayList) {
         testSources.add("C:/Users/SG0306258/OneDrive - Sabre/Desktop/testlicencjat/test1.txt");
         testSources.add("C:/Users/SG0306258/OneDrive - Sabre/Desktop/testlicencjat/test2.txt");
 
@@ -31,7 +31,7 @@ public class RSyncFileUpdaterProvider {
         }
     }
 
-    private boolean validate(ArrayList<FileRQ> fileRQArrayList) {
+    private boolean validate(List<FileRQList> fileRQArrayList) {
         return true;
     }
 }

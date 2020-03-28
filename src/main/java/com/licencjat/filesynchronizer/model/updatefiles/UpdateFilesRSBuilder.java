@@ -17,6 +17,8 @@ public class UpdateFilesRSBuilder {
     }
 
     public UpdateFilesRS build() {
-        return new UpdateFilesRS("success");
+        UpdateFilesRS updateFilesRS = new UpdateFilesRS();
+        updateFilesRS.setStatus(this.status);
+        return updateFilesRS;
     }
 }
