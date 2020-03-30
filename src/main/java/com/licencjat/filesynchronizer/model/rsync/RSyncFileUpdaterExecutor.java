@@ -11,12 +11,12 @@ import java.util.List;
 public class RSyncFileUpdaterExecutor {
 
     List<String> sources;
-    List<String> destinations;
+    String destination;
     RSync rSync = new RSync();
 
     public void execute(List<FileRQList> fileRQArrayList) {
         rSync.sources(sources)
-                .destination(destinations.get(0))
+                .destination(destination)
                 .recursive(true)
                 .verbose(true);
         try {
@@ -37,8 +37,8 @@ public class RSyncFileUpdaterExecutor {
     }
 
 
-    public RSyncFileUpdaterExecutor setDestinations(List<String> destinations) {
-        this.destinations = destinations;
+    public RSyncFileUpdaterExecutor setDestinations(String destinations) {
+        this.destination = destinations;
         return this;
     }
 }
