@@ -29,20 +29,10 @@ public class FileUpdaterService implements FileUpdaterInterface {
         List<FileRQList> fileRQList = updateFilesRQ.getFileRQList();
 
         if (!fileRQList.isEmpty()) {
-            rSyncFileUpdaterProvider.process(fileRQList);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
 
-
-        UpdateFilesRS updateFilesRS = new UpdateFilesRSBuilder("success").build();
-
-        HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.setContentType(MediaType.APPLICATION_JSON);
-        httpHeaders.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
-
-        return new ResponseEntity<>(
-                updateFilesRS,
-                httpHeaders,
-                HttpStatus.OK);
+        return rSyncFileUpdaterProvider.process(fileRQList);
     }
 
 }
