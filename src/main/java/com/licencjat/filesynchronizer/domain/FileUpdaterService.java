@@ -28,7 +28,7 @@ public class FileUpdaterService implements FileUpdaterInterface {
 
         List<FileRQList> fileRQList = updateFilesRQ.getFileRQList();
 
-        if (!fileRQList.isEmpty()) {
+        if (fileRQList.isEmpty()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
 
