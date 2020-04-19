@@ -24,9 +24,9 @@ public class RestClientController {
         return fileUpdaterService.updateFilesRSCreator(updateFilesRQ);
     }
 
-
-    @PostMapping(value = "/compareFiles", produces = MediaType.APPLICATION_JSON_VALUE)
-    public HttpEntity<String> compareFiles() {
-        return null;
+    //TODO zrob tak zeby sie tez klientowi aktualizowalo, nie ma jak inaczej. Sprawdz czy zmiany na kliencie nie spowoduja wylapania eventu
+    @PostMapping(value = "/compareFiles", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<UpdateFilesRS> compareFiles(@RequestBody UpdateFilesRQ updateFilesRQ) {
+        return fileUpdaterService.compareFilesRSCreator(updateFilesRQ);
     }
 }

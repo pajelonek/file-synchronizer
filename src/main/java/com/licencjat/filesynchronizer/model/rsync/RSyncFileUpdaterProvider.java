@@ -5,22 +5,13 @@ import com.licencjat.filesynchronizer.model.updatefiles.UpdateFilesRS;
 import com.licencjat.filesynchronizer.model.updatefiles.UpdateFilesRSBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
+import java.io.File;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+
 import java.util.stream.Collectors;
 
 @Component
@@ -35,44 +26,30 @@ public class RSyncFileUpdaterProvider {
     @Value("${user.remote.directory}")
     private String userRemoteDirectory;
 
-    public ResponseEntity<UpdateFilesRS> process(List<FileRQList> fileRQArrayList) {
+    public ResponseEntity<UpdateFilesRS> processUpdating(List<FileRQList> fileRQArrayList) {
 
-
+        deleteRemovedFiles(fileRQArrayList);
         if (validate(fileRQArrayList)) {
 
-            List<String> localFilePaths = mapFilePaths(fileRQArrayList);
-            //\test1.txt
-            //\test\test1.txt
-            //\test\test2.txt
+            fileRQArrayList
+                    .forEach(file -> file.setFilePath(file.getFilePath().replace(userLocalDirectory, "")));
 
-            Set<String> uniqueFilePathsPrefixes = localFilePaths.stream()
-                    .map(localFilePath -> localFilePath.substring(0, localFilePath.lastIndexOf('\\')))
-                    .collect(Collectors.toSet());
-            //""
-            //"\test"
-            Map<String, List<String>> mappedFilePaths = new HashMap<>();
+            fileRQArrayList.stream()
+                    .collect(Collectors.groupingBy(fileToUpdate -> fileToUpdate.getFilePath().substring(0, fileToUpdate.getFilePath().lastIndexOf('\\'))))
+                    .forEach((prefixOfPath, fileRQ) -> {
+                                List<String> sources = fileRQ.stream()
+                                        .map(FileRQList::getFilePath)
+                                        .map(FilePath -> userLocalDirectory + FilePath)
+                                        .collect(Collectors.toList());
 
-            uniqueFilePathsPrefixes.forEach(filePathPrefix -> {
-                List<String> mappedLocalFilePaths = localFilePaths.stream()
-                        .filter(el -> el.substring(0, el.lastIndexOf('\\')).equals(filePathPrefix))
-                        .collect(Collectors.toList());
-                mappedFilePaths.put(filePathPrefix, mappedLocalFilePaths);
-            });
-            //"" - {\test1.txt}
-            //"\test" - {\test1.txt, \test2.txt}
+                                rSyncFileUpdaterExecutor
+                                        .setSources(sources)
+                                        .setDestination(userRemoteDirectory + prefixOfPath + "\\")
+                                        .execute();
 
-            mappedFilePaths.forEach((prefix, sufix) -> {
-                List<String> sources = sufix.stream()
-                        .map(source -> userLocalDirectory+source)
-                        .collect(Collectors.toList());
-
-                rSyncFileUpdaterExecutor
-                        .setSources(sources)
-                        .setDestination(userRemoteDirectory+prefix+"\\")
-                        .execute();
-
-            });
-
+                                updateFile(fileRQ);
+                            }
+                    );
 
         } else {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
@@ -82,16 +59,53 @@ public class RSyncFileUpdaterProvider {
         return ResponseEntity.ok(new UpdateFilesRSBuilder("success").build());
     }
 
+    //TODO fill it
+    private void deleteRemovedFiles(List<FileRQList> fileRQArrayList) {
+        List<FileRQList> removedFiles = fileRQArrayList.stream()
+                .filter(e -> e.getAction().equals("DELETED"))
+                .collect(Collectors.toList());
+
+        if (!removedFiles.isEmpty()) {
+
+        }
+    }
+
     private boolean validate(List<FileRQList> fileRQArrayList) {
         return fileRQArrayList.stream()
                 .map(FileRQList::getFilePath)
                 .allMatch(path -> path.startsWith(userLocalDirectory));
     }
 
-    private List<String> mapFilePaths(List<FileRQList> fileRQArrayList) {
-        return fileRQArrayList.stream()
-                .map(FileRQList::getFilePath)
-                .map(el -> el.replace(userLocalDirectory, ""))
-                .collect(Collectors.toList());
+    //TODO make correct validation for dateModificaiton
+    private void updateFile(List<FileRQList> fileRQList) {
+        for (FileRQList fileRQ : fileRQList) {
+            File file = new File(userRemoteDirectory + fileRQ.getFilePath());
+            if (!file.setLastModified(Long.parseLong(fileRQ.getLastModified()))) break;
+        }
+    }
+
+    public ResponseEntity<UpdateFilesRS> processComparing(List<FileRQList> serverFileList ,List<FileRQList> clientFileList) {
+
+        clientFileList
+                .forEach(file -> file.setFilePath(file.getFilePath().replace(userLocalDirectory, "")));
+
+        clientFileList.stream()
+                .collect(Collectors.groupingBy(fileToUpdate -> fileToUpdate.getFilePath().substring(0, fileToUpdate.getFilePath().lastIndexOf('\\'))))
+                .forEach((prefixOfPath, fileRQ) -> {
+                            List<String> sources = fileRQ.stream()
+                                    .map(FileRQList::getFilePath)
+                                    .map(FilePath -> userLocalDirectory + FilePath)
+                                    .collect(Collectors.toList());
+
+
+                            rSyncFileUpdaterExecutor
+                                    .setSources(sources)
+                                    .setDestination(userRemoteDirectory + prefixOfPath + "\\")
+                                    .execute();
+
+                            updateFile(fileRQ);
+                        }
+                );
+        return ResponseEntity.ok(new UpdateFilesRSBuilder("success").build());
     }
 }
