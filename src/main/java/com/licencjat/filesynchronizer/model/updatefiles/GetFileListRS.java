@@ -17,7 +17,7 @@ import java.util.Map;
         "mainFolder",
         "fileRQList",
 })
-public class UpdateFilesRQ {
+public class GetFileListRS {
 
     @JsonProperty("name")
     private String name;
