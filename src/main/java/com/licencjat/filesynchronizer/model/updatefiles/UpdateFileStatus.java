@@ -1,6 +1,5 @@
 package com.licencjat.filesynchronizer.model.updatefiles;
 
-
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -9,22 +8,34 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
         "status",
-        "fileRQList"
+        "filePath",
+        "lastModified",
 })
-public class UpdateFilesRS {
+public class UpdateFileStatus {
 
+    @JsonProperty("filePath")
+    private String filePath;
     @JsonProperty("status")
     private String status;
-    @JsonProperty("fileRQList")
-    private List<UpdateFileStatus> updateFile = null;
+    @JsonProperty("lastModified")
+    private String lastModified;
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
+
+    @JsonProperty("filePath")
+    public String getFilePath() {
+        return filePath;
+    }
+
+    @JsonProperty("filePath")
+    public void setFilePath(String filePath) {
+        this.filePath = filePath;
+    }
 
     @JsonProperty("status")
     public String getStatus() {
@@ -36,16 +47,15 @@ public class UpdateFilesRS {
         this.status = status;
     }
 
-    @JsonProperty("fileRQList")
-    public List<UpdateFileStatus> getUpdateFile() {
-        return updateFile;
+    @JsonProperty("lastModified")
+    public String getLastModified() {
+        return lastModified;
     }
 
-    @JsonProperty("fileRQList")
-    public void setUpdateFile(List<UpdateFileStatus> updateFile) {
-        this.updateFile = updateFile;
+    @JsonProperty("lastModified")
+    public void setLastModified(String lastModified) {
+        this.lastModified = lastModified;
     }
-
 
     @JsonAnyGetter
     public Map<String, Object> getAdditionalProperties() {

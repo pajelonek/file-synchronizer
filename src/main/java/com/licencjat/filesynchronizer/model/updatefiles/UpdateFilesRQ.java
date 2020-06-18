@@ -14,6 +14,7 @@ import java.util.Map;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
         "name",
+        "host",
         "mainFolder",
         "fileRQList",
 })
@@ -21,10 +22,12 @@ public class UpdateFilesRQ {
 
     @JsonProperty("name")
     private String name;
+    @JsonProperty("host")
+    private String host;
     @JsonProperty("mainFolder")
     private String mainFolder;
     @JsonProperty("fileRQList")
-    private List<FileRQList> fileRQList = null;
+    private List<UpdateFile> updateFile = null;
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
@@ -38,6 +41,16 @@ public class UpdateFilesRQ {
         this.name = name;
     }
 
+    @JsonProperty("host")
+    public String getHost() {
+        return host;
+    }
+
+    @JsonProperty("host")
+    public void setHost(String host) {
+        this.host = host;
+    }
+
     @JsonProperty("mainFolder")
     public String getMainFolder() {
         return mainFolder;
@@ -49,13 +62,13 @@ public class UpdateFilesRQ {
     }
 
     @JsonProperty("fileRQList")
-    public List<FileRQList> getFileRQList() {
-        return fileRQList;
+    public List<UpdateFile> getUpdateFile() {
+        return updateFile;
     }
 
     @JsonProperty("fileRQList")
-    public void setFileRQList(List<FileRQList> fileRQList) {
-        this.fileRQList = fileRQList;
+    public void setUpdateFile(List<UpdateFile> updateFile) {
+        this.updateFile = updateFile;
     }
 
     @JsonAnyGetter

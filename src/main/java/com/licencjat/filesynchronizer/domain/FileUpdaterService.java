@@ -1,11 +1,12 @@
 package com.licencjat.filesynchronizer.domain;
 
-import com.licencjat.filesynchronizer.model.updatefiles.FileRQList;
-import com.licencjat.filesynchronizer.model.updatefiles.GetFileListRS;
+import com.licencjat.filesynchronizer.model.updatefiles.UpdateFile;
+import com.licencjat.filesynchronizer.model.updatefiles.UpdateFileStatus;
 import com.licencjat.filesynchronizer.model.updatefiles.UpdateFilesRQ;
 import com.licencjat.filesynchronizer.model.updatefiles.UpdateFilesRS;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
@@ -16,8 +17,7 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @Component
 public class FileUpdaterService {
@@ -25,75 +25,101 @@ public class FileUpdaterService {
     @Value("${user.remote.directory}")
     private String userRemoteDirectory;
 
+    @Value("${user.absolute.path}")
+    private String userAbsolutePath;
+
+    @Autowired
+    private FileChangesLogger fileChangesLogger;
+
     Logger logger = LoggerFactory.getLogger(FileUpdaterService.class);
 
-    private List<FileRQList> getServerFileList() {
-        List<FileRQList> fileRQList = new ArrayList<>();
-
-        try (DirectoryStream<Path> stream = Files.newDirectoryStream(Paths.get(userRemoteDirectory))) {
-            for (Path path : stream) {
-                if (!Files.isDirectory(path)) {
-                    FileRQList fileRQ = new FileRQList();
-                    File file = path.toFile();
-                    fileRQ.setFilePath(cutPrefixFromFilePath(file.getPath()));
-                    fileRQ.setLastModified(String.valueOf(file.lastModified()));
-                    fileRQList.add(fileRQ);
-                } else listFilesFromDirectory(path, fileRQList);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return fileRQList;
+    public List<UpdateFile> getServerFileList(String userLocalPath) {
+        List<UpdateFile> updateFile = new ArrayList<>();
+        listFilesFromDirectory(Paths.get(userLocalPath), updateFile);
+        return updateFile;
     }
 
-    public void listFilesFromDirectory(Path path, List<FileRQList> fileRQList) {
+    public void listFilesFromDirectory(Path path, List<UpdateFile> updateFile) {
         try (DirectoryStream<Path> stream = Files.newDirectoryStream(path)) {
             for (Path pathInSubfolder : stream)
                 if (!Files.isDirectory(pathInSubfolder)) {
-                    FileRQList fileRQ = new FileRQList();
+                    UpdateFile fileRQ = new UpdateFile();
                     File file = pathInSubfolder.toFile();
                     fileRQ.setFilePath(cutPrefixFromFilePath(file.getPath()));
                     fileRQ.setLastModified(String.valueOf(file.lastModified()));
-                    fileRQList.add(fileRQ);
-                } else listFilesFromDirectory(pathInSubfolder, fileRQList);
+                    updateFile.add(fileRQ);
+                } else listFilesFromDirectory(pathInSubfolder, updateFile);
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
     private String cutPrefixFromFilePath(String path) {
-        return path.replace(userRemoteDirectory, "");
+        return path.replace(userAbsolutePath, "");
     }
 
-    public ResponseEntity<GetFileListRS> getFileList() {
-        GetFileListRS getFileListRS = new GetFileListRS();
-        getFileListRS.setName("GetFileListRS");
+    public ResponseEntity<UpdateFilesRQ> getFileList() {
+        UpdateFilesRQ getFileListRS = new UpdateFilesRQ();
+        getFileListRS.setName("UpdateFilesRQ");
         getFileListRS.setMainFolder(userRemoteDirectory);
-        getFileListRS.setFileRQList(getServerFileList());
+        getFileListRS.setUpdateFile(getServerFileList(userAbsolutePath));
         return ResponseEntity.ok().body(getFileListRS);
     }
 
-    public ResponseEntity<UpdateFilesRS> setModificationDate(UpdateFilesRQ updateFilesRQ) {
-        List<FileRQList> fileRQList = updateFilesRQ.getFileRQList();
-        for (FileRQList fileRQ : fileRQList) {
+    public ResponseEntity<UpdateFilesRS> setModificationDates(UpdateFilesRQ updateFilesRQ) {
+        List<UpdateFileStatus> updateFilesStatusList = new ArrayList<>();
+        List<UpdateFile> updateFile = updateFilesRQ.getUpdateFile();
+        for (UpdateFile fileRQ : updateFile) {
+            UpdateFileStatus updateFileStatus = new UpdateFileStatus();
+            updateFileStatus.setFilePath(fileRQ.getFilePath());
             logger.info("Changing modification date for file: " + fileRQ.getFilePath());
-            File file = new File(userRemoteDirectory + fileRQ.getFilePath());
+            File file = new File(userAbsolutePath + fileRQ.getFilePath());
             if (file.exists() && file.setLastModified(Long.parseLong(fileRQ.getLastModified()))) {
+                updateFileStatus.setStatus("OK");
+                updateFileStatus.setLastModified(String.valueOf(file.lastModified()));
                 logger.info("Successfully modified date for file: " + fileRQ.getFilePath());
-            } else throw new Error("Could not find file on server");
+                fileChangesLogger.addLogFile(fileRQ, updateFilesRQ.getHost());
+            } else {
+                logger.info("Could not modified file on server: "+ fileRQ.getFilePath());
+                updateFileStatus.setStatus("ERROR");
+            }
+            updateFilesStatusList.add(updateFileStatus);
         }
-        return ResponseEntity.ok().body(null);
+
+        UpdateFilesRS updateFilesRS = createUpdateFilesRS(updateFilesStatusList);
+        return ResponseEntity.ok().body(updateFilesRS);
     }
 
     public ResponseEntity<UpdateFilesRS> removeFiles(UpdateFilesRQ updateFilesRQ) {
-        List<FileRQList> fileRQList = updateFilesRQ.getFileRQList();
-        for (FileRQList fileRQ : fileRQList) {
+        List<UpdateFileStatus> updateFilesStatusList = new ArrayList<>();
+        List<UpdateFile> updateFile = updateFilesRQ.getUpdateFile();
+        for (UpdateFile fileRQ : updateFile) {
+            UpdateFileStatus updateFileStatus = new UpdateFileStatus();
+            updateFileStatus.setFilePath(fileRQ.getFilePath());
             logger.info("Removing file: " + fileRQ.getFilePath());
-            File file = new File(userRemoteDirectory + fileRQ.getFilePath());
+            File file = new File(userAbsolutePath + fileRQ.getFilePath());
             if (file.exists() && file.delete()) {
-                logger.info("Successfully deleted file {} on server: " + fileRQ.getFilePath());
-            } else throw new Error("Could not find file on server");
+                updateFileStatus.setStatus("OK");
+                logger.info("Successfully deleted file on server: " + fileRQ.getFilePath());
+                fileChangesLogger.addLogFile(fileRQ, updateFilesRQ.getHost());
+            } else {
+                logger.info("Could not remove file on server: "+ fileRQ.getFilePath());
+                updateFileStatus.setStatus("ERROR");
+            }
+            updateFilesStatusList.add(updateFileStatus);
         }
-        return ResponseEntity.ok().body(null);
+        UpdateFilesRS updateFilesRS = createUpdateFilesRS(updateFilesStatusList);
+        return ResponseEntity.ok().body(updateFilesRS);
+    }
+
+    private UpdateFilesRS createUpdateFilesRS(List<UpdateFileStatus> updateFilesStatusList) {
+        UpdateFilesRS updateFilesRS = new UpdateFilesRS();
+
+        boolean result = updateFilesStatusList.stream().allMatch(file -> file.getStatus().equals("OK"));
+        if(result) updateFilesRS.setStatus("ok");
+        else updateFilesRS.setStatus("error");
+
+        updateFilesRS.setUpdateFile(updateFilesStatusList);
+        return  updateFilesRS;
     }
 }

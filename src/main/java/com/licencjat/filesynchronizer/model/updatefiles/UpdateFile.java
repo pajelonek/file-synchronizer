@@ -9,43 +9,53 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
-        "status",
-        "fileRQList"
+        "filePath",
+        "lastModified"
 })
-public class UpdateFilesRS {
+public class UpdateFile {
 
-    @JsonProperty("status")
-    private String status;
-    @JsonProperty("fileRQList")
-    private List<UpdateFileStatus> updateFile = null;
+    @JsonProperty("filePath")
+    private String filePath;
+    @JsonProperty("lastModified")
+    private String lastModified;
+    @JsonProperty("action")
+    private String action;
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
-    @JsonProperty("status")
-    public String getStatus() {
-        return status;
+    @JsonProperty("filePath")
+    public String getFilePath() {
+        return filePath;
     }
 
-    @JsonProperty("status")
-    public void setStatus(String status) {
-        this.status = status;
+    @JsonProperty("filePath")
+    public void setFilePath(String filePath) {
+        this.filePath = filePath;
     }
 
-    @JsonProperty("fileRQList")
-    public List<UpdateFileStatus> getUpdateFile() {
-        return updateFile;
+    @JsonProperty("lastModified")
+    public String getLastModified() {
+        return lastModified;
     }
 
-    @JsonProperty("fileRQList")
-    public void setUpdateFile(List<UpdateFileStatus> updateFile) {
-        this.updateFile = updateFile;
+    @JsonProperty("lastModified")
+    public void setLastModified(String lastModified) {
+        this.lastModified = lastModified;
     }
 
+    @JsonProperty("action")
+    public String getAction() {
+        return action;
+    }
+
+    @JsonProperty("action")
+    public void setAction(String action) {
+        this.action = action;
+    }
 
     @JsonAnyGetter
     public Map<String, Object> getAdditionalProperties() {
