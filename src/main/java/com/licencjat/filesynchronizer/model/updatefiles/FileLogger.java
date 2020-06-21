@@ -15,6 +15,7 @@ public class FileLogger {
 
     @JsonProperty("currentTime")
     private String currentTime;
+
     @JsonProperty("logFileList")
     private List<LogFile> logFileList;
 

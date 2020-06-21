@@ -1,14 +1,8 @@
 package com.licencjat.filesynchronizer.model.updatefiles;
 
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-
-import java.util.HashMap;
-import java.util.Map;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
@@ -24,8 +18,6 @@ public class UpdateFileStatus {
     private String status;
     @JsonProperty("lastModified")
     private String lastModified;
-    @JsonIgnore
-    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     @JsonProperty("filePath")
     public String getFilePath() {
@@ -55,16 +47,6 @@ public class UpdateFileStatus {
     @JsonProperty("lastModified")
     public void setLastModified(String lastModified) {
         this.lastModified = lastModified;
-    }
-
-    @JsonAnyGetter
-    public Map<String, Object> getAdditionalProperties() {
-        return this.additionalProperties;
-    }
-
-    @JsonAnySetter
-    public void setAdditionalProperty(String name, Object value) {
-        this.additionalProperties.put(name, value);
     }
 
 }

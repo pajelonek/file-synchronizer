@@ -1,31 +1,26 @@
 package com.licencjat.filesynchronizer.model.updatefiles;
 
 
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
-import java.util.HashMap;
-import java.util.Map;
-
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
         "filePath",
-        "lastModified"
+        "lastModified",
+        "action"
 })
 public class UpdateFile {
 
     @JsonProperty("filePath")
     private String filePath;
+
     @JsonProperty("lastModified")
     private String lastModified;
+
     @JsonProperty("action")
     private String action;
-    @JsonIgnore
-    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     @JsonProperty("filePath")
     public String getFilePath() {
@@ -55,16 +50,6 @@ public class UpdateFile {
     @JsonProperty("action")
     public void setAction(String action) {
         this.action = action;
-    }
-
-    @JsonAnyGetter
-    public Map<String, Object> getAdditionalProperties() {
-        return this.additionalProperties;
-    }
-
-    @JsonAnySetter
-    public void setAdditionalProperty(String name, Object value) {
-        this.additionalProperties.put(name, value);
     }
 
 }
