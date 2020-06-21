@@ -6,7 +6,6 @@ import com.licencjat.filesynchronizer.model.updatefiles.UpdateFilesRQ;
 import com.licencjat.filesynchronizer.model.updatefiles.UpdateFilesRS;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
@@ -28,10 +27,13 @@ public class FileUpdaterService {
     @Value("${user.absolute.path}")
     private String userAbsolutePath;
 
-    @Autowired
-    private FileChangesLogger fileChangesLogger;
+    private final FileChangesLogger fileChangesLogger;
 
     Logger logger = LoggerFactory.getLogger(FileUpdaterService.class);
+
+    public FileUpdaterService(FileChangesLogger fileChangesLogger) {
+        this.fileChangesLogger = fileChangesLogger;
+    }
 
     public List<UpdateFile> getServerFileList(String userLocalPath) {
         List<UpdateFile> updateFile = new ArrayList<>();
@@ -80,7 +82,7 @@ public class FileUpdaterService {
                 logger.info("Successfully modified date for file: " + fileRQ.getFilePath());
                 fileChangesLogger.addLogFile(fileRQ, updateFilesRQ.getHost());
             } else {
-                logger.info("Could not modified file on server: "+ fileRQ.getFilePath());
+                logger.info("Could not modified file on server: " + fileRQ.getFilePath());
                 updateFileStatus.setStatus("ERROR");
             }
             updateFilesStatusList.add(updateFileStatus);
@@ -103,7 +105,7 @@ public class FileUpdaterService {
                 logger.info("Successfully deleted file on server: " + fileRQ.getFilePath());
                 fileChangesLogger.addLogFile(fileRQ, updateFilesRQ.getHost());
             } else {
-                logger.info("Could not remove file on server: "+ fileRQ.getFilePath());
+                logger.info("Could not remove file on server: " + fileRQ.getFilePath());
                 updateFileStatus.setStatus("ERROR");
             }
             updateFilesStatusList.add(updateFileStatus);
@@ -116,10 +118,10 @@ public class FileUpdaterService {
         UpdateFilesRS updateFilesRS = new UpdateFilesRS();
 
         boolean result = updateFilesStatusList.stream().allMatch(file -> file.getStatus().equals("OK"));
-        if(result) updateFilesRS.setStatus("ok");
+        if (result) updateFilesRS.setStatus("ok");
         else updateFilesRS.setStatus("error");
 
         updateFilesRS.setUpdateFile(updateFilesStatusList);
-        return  updateFilesRS;
+        return updateFilesRS;
     }
 }

@@ -6,7 +6,6 @@ import com.licencjat.filesynchronizer.domain.FileUpdaterService;
 import com.licencjat.filesynchronizer.model.updatefiles.FileLogger;
 import com.licencjat.filesynchronizer.model.updatefiles.UpdateFilesRQ;
 import com.licencjat.filesynchronizer.model.updatefiles.UpdateFilesRS;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,11 +17,14 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class RestClientController {
 
-    @Autowired
-    private FileUpdaterService fileUpdaterService;
+    private final FileUpdaterService fileUpdaterService;
 
-    @Autowired
-    private FileChangesLogger fileChangesLogger;
+    private final FileChangesLogger fileChangesLogger;
+
+    public RestClientController(FileUpdaterService fileUpdaterService, FileChangesLogger fileChangesLogger) {
+        this.fileUpdaterService = fileUpdaterService;
+        this.fileChangesLogger = fileChangesLogger;
+    }
 
     @GetMapping(value = "/getFileList")
     public ResponseEntity<UpdateFilesRQ> getFileList() {
