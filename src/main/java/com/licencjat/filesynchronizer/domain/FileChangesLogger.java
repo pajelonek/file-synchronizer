@@ -19,13 +19,13 @@ public class FileChangesLogger {
 
     Logger logger = LoggerFactory.getLogger(FileChangesLogger.class);
 
-    public void addLogFile(UpdateFile updateFile, String hostname){
-        logger.info("Adding logfile for {} from {}",updateFile.getFilePath(), hostname);
+    public void addLogFile(UpdateFile updateFile, String hostname) {
+        logger.info("Adding logfile for {} from {}", updateFile.getFilePath(), hostname);
         LogFile logFile = createLogFile(updateFile, hostname);
         logFileList.add(logFile);
     }
 
-    public long getCurrentTime(){
+    public long getCurrentTime() {
         return Instant.now().getEpochSecond();
     }
 
@@ -36,7 +36,7 @@ public class FileChangesLogger {
         return ResponseEntity.ok().body(fileLogger);
     }
 
-    public LogFile createLogFile(UpdateFile updateFile, String hostname){
+    public LogFile createLogFile(UpdateFile updateFile, String hostname) {
         LogFile logFile = new LogFile();
         logFile.setTimeOfChange(String.valueOf(getCurrentTime()));
         logFile.setLastModified(updateFile.getLastModified());
@@ -46,7 +46,7 @@ public class FileChangesLogger {
         return logFile;
     }
 
-    public void cleanLogFileList(){
-     logFileList = new ArrayList<>();
+    public void cleanLogFileList() {
+        logFileList = new ArrayList<>();
     }
 }
