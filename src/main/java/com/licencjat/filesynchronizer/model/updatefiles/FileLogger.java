@@ -2,9 +2,7 @@ package com.licencjat.filesynchronizer.model.updatefiles;
 
 import com.fasterxml.jackson.annotation.*;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
@@ -18,9 +16,6 @@ public class FileLogger {
 
     @JsonProperty("logFileList")
     private List<LogFile> logFileList;
-
-    @JsonIgnore
-    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     @JsonProperty("currentTime")
     public String getCurrentTime() {
@@ -40,16 +35,6 @@ public class FileLogger {
     @JsonProperty("logFileList")
     public void setLogFileList(List<LogFile> logFileList) {
         this.logFileList = logFileList;
-    }
-
-    @JsonAnyGetter
-    public Map<String, Object> getAdditionalProperties() {
-        return this.additionalProperties;
-    }
-
-    @JsonAnySetter
-    public void setAdditionalProperty(String name, Object value) {
-        this.additionalProperties.put(name, value);
     }
 
 }
