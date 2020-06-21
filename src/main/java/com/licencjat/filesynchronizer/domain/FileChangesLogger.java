@@ -15,7 +15,7 @@ import java.util.List;
 @Component
 public class FileChangesLogger {
 
-    private final List<LogFile> logFileList = new ArrayList<>();
+    private List<LogFile> logFileList = new ArrayList<>();
 
     Logger logger = LoggerFactory.getLogger(FileChangesLogger.class);
 
@@ -44,5 +44,9 @@ public class FileChangesLogger {
         logFile.setHost(hostname);
         logFile.setAction(updateFile.getAction());
         return logFile;
+    }
+
+    public void cleanLogFileList(){
+     logFileList = new ArrayList<>();
     }
 }
