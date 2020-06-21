@@ -2,11 +2,9 @@ package com.licencjat.filesynchronizer;
 
 import static org.junit.Assert.*;
 
+import com.licencjat.filesynchronizer.domain.FileChangesLogger;
 import com.licencjat.filesynchronizer.domain.FileUpdaterService;
-import com.licencjat.filesynchronizer.model.updatefiles.UpdateFile;
-import com.licencjat.filesynchronizer.model.updatefiles.UpdateFileStatus;
-import com.licencjat.filesynchronizer.model.updatefiles.UpdateFilesRQ;
-import com.licencjat.filesynchronizer.model.updatefiles.UpdateFilesRS;
+import com.licencjat.filesynchronizer.model.updatefiles.*;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -29,6 +27,9 @@ public class FileUpdateServiceTest {
     @Autowired
     FileUpdaterService fileUpdaterService;
 
+    @Autowired
+    FileChangesLogger fileChangesLogger;
+
     @Value("${user.absolute.path}")
     private String userAbsolutePath;
 
@@ -36,6 +37,7 @@ public class FileUpdateServiceTest {
 
     private List<String> setOne;
     private List<String> setTwo;
+    private final String hostName = "TEST";
 
     @Test
     public void removeFilesTestSetOne() {
@@ -53,6 +55,42 @@ public class FileUpdateServiceTest {
         boolean result = responseEntity.getBody().getUpdateFile().stream()
                 .allMatch(updateFileStatus -> updateFileStatus.getStatus().equals("OK"));
         assertTrue(result);
+
+        List<LogFile> logFileList = Objects.requireNonNull(fileChangesLogger.getLogFileList().getBody()).getLogFileList();
+        List<String> setOneFromLogger = logFileList.stream()
+                .map(LogFile::getFilePath)
+                .collect(Collectors.toList());
+        assertEquals(setOne, setOneFromLogger);
+        assertEquals(setOne.size(), setOneFromLogger.size());
+
+        fileChangesLogger.cleanLogFileList();
+    }
+
+    @Test
+    public void removeFilesTestSetTwo() {
+        //when
+        createResourcesFilesSetTwo();
+
+        //given
+        UpdateFilesRQ updateFilesRQ = createUpdateFilesRQSetTwo();
+
+        //then
+        ResponseEntity<UpdateFilesRS> responseEntity = fileUpdaterService.removeFiles(updateFilesRQ);
+        assertEquals(responseEntity.getStatusCodeValue(), 200);
+        assertEquals(Objects.requireNonNull(responseEntity.getBody()).getUpdateFile().size(), setTwo.size());
+        assertEquals(responseEntity.getBody().getStatus(), "ok");
+        boolean result = responseEntity.getBody().getUpdateFile().stream()
+                .allMatch(updateFileStatus -> updateFileStatus.getStatus().equals("OK"));
+        assertTrue(result);
+
+        List<LogFile> logFileList = Objects.requireNonNull(fileChangesLogger.getLogFileList().getBody()).getLogFileList();
+        List<String> setOneFromLogger = logFileList.stream()
+                .map(LogFile::getFilePath)
+                .collect(Collectors.toList());
+        assertEquals(setTwo, setOneFromLogger);
+        assertEquals(setTwo.size(), setOneFromLogger.size());
+
+        fileChangesLogger.cleanLogFileList();
     }
 
     @Test
@@ -67,6 +105,10 @@ public class FileUpdateServiceTest {
         assertEquals(responseEntity.getStatusCodeValue(), 200);
         assertTrue(Objects.requireNonNull(responseEntity.getBody()).getUpdateFile().isEmpty());
         assertEquals(responseEntity.getBody().getStatus(), "ok");
+
+        List<LogFile> logFileList = Objects.requireNonNull(fileChangesLogger.getLogFileList().getBody()).getLogFileList();
+        assertTrue(logFileList.isEmpty());
+        fileChangesLogger.cleanLogFileList();
     }
 
     @Test
@@ -77,6 +119,7 @@ public class FileUpdateServiceTest {
         //given
         UpdateFilesRQ updateFilesRQ = createUpdateFilesRQSetOne();
         int indexOfWrongFile = 1;
+        int numberOfWrongFiles = 1;
         updateFilesRQ.getUpdateFile().get(indexOfWrongFile).setFilePath("abcd");
 
 
@@ -89,6 +132,16 @@ public class FileUpdateServiceTest {
                 .allMatch(updateFileStatus -> updateFileStatus.getStatus().equals("OK"));
         assertFalse(result);
         assertEquals(responseEntity.getBody().getUpdateFile().get(indexOfWrongFile).getStatus(), "ERROR");
+
+        List<LogFile> logFileList = Objects.requireNonNull(fileChangesLogger.getLogFileList().getBody()).getLogFileList();
+        List<String> setOneFromLogger = logFileList.stream()
+                .map(LogFile::getFilePath)
+                .collect(Collectors.toList());
+
+        assertEquals(setOne.size(), setOneFromLogger.size() + numberOfWrongFiles);
+        assertEquals(logFileList.size(), setOneFromLogger.size());
+
+        fileChangesLogger.cleanLogFileList();
     }
 
     @Test
@@ -138,6 +191,15 @@ public class FileUpdateServiceTest {
         boolean result = responseEntity.getBody().getUpdateFile().stream()
                 .allMatch(updateFileStatus -> updateFileStatus.getStatus().equals("OK"));
         assertTrue(result);
+
+        List<LogFile> logFileList = Objects.requireNonNull(fileChangesLogger.getLogFileList().getBody()).getLogFileList();
+        List<String> setOneFromLogger = logFileList.stream()
+                .map(LogFile::getFilePath)
+                .collect(Collectors.toList());
+        assertEquals(setOne, setOneFromLogger);
+        assertEquals(setOne.size(), setOneFromLogger.size());
+
+        fileChangesLogger.cleanLogFileList();
     }
 
 
@@ -145,20 +207,20 @@ public class FileUpdateServiceTest {
         createSetOne();
         try {
             File directory = new File(userAbsolutePath + "/testDirectory");
-            if(!directory.exists()) {
+            if (!directory.exists()) {
                 if (directory.mkdir())
                     logger.info("Successfully created test directory '{}/testDirectory'", userAbsolutePath);
                 else throw new Error("Could not create directory");
                 directory.deleteOnExit();
             } else logger.info("Test directory '{}/testDirectory' already exists", userAbsolutePath);
             File subDirectory = new File(userAbsolutePath + "/testDirectory/SubDirectory");
-            if(!subDirectory.exists()) {
+            if (!subDirectory.exists()) {
                 if (subDirectory.mkdir())
                     logger.info("Successfully created test directory '{}/testDirectory/SubDirectory'", userAbsolutePath);
                 else throw new Error("Could not create directory");
                 subDirectory.deleteOnExit();
             } else logger.info("Test directory '{}/testDirectory/SubDirectory' already exists", userAbsolutePath);
-            for(String filePath : setOne){
+            for (String filePath : setOne) {
                 File file = new File(userAbsolutePath + filePath);
                 FileUtils.touch(file);
                 file.deleteOnExit();
@@ -169,7 +231,7 @@ public class FileUpdateServiceTest {
         }
     }
 
-    private void createSetOne(){
+    private void createSetOne() {
         setOne = new ArrayList<>();
         setOne.add("/testDirectory/fileOne.txt");
         setOne.add("/testDirectory/fileTwo.txt");
@@ -180,21 +242,20 @@ public class FileUpdateServiceTest {
         createSetTwo();
         try {
             File directory = new File(userAbsolutePath + "/testDirectory");
-            if(!directory.exists()) {
+            if (!directory.exists()) {
                 if (directory.mkdir())
                     logger.info("Successfully created test directory '{}/testDirectory'", userAbsolutePath);
                 else throw new Error("Could not create directory");
                 directory.deleteOnExit();
-            }
-            else logger.info("Test directory '{}/testDirectory' already exists", userAbsolutePath);
+            } else logger.info("Test directory '{}/testDirectory' already exists", userAbsolutePath);
             File subDirectory = new File(userAbsolutePath + "/testDirectory/SubDirectory");
-            if(!subDirectory.exists()) {
+            if (!subDirectory.exists()) {
                 if (subDirectory.mkdir())
                     logger.info("Successfully created test directory '{}/testDirectory/SubDirectory'", userAbsolutePath);
                 else throw new Error("Could not create directory");
                 subDirectory.deleteOnExit();
-            }  logger.info("Test directory '{}/testDirectory' already exists", userAbsolutePath);
-            for(String filePath : setTwo){
+            } else logger.info("Test directory '{}/testDirectory' already exists", userAbsolutePath);
+            for (String filePath : setTwo) {
                 File file = new File(userAbsolutePath + filePath);
                 FileUtils.touch(file);
                 file.deleteOnExit();
@@ -205,7 +266,7 @@ public class FileUpdateServiceTest {
         }
     }
 
-    private void createSetTwo(){
+    private void createSetTwo() {
         setTwo = new ArrayList<>();
         setTwo.add("\\testDirectory\\fileOne.txt");
         setTwo.add("\\testDirectory\\fileTwo.txt");
@@ -213,17 +274,35 @@ public class FileUpdateServiceTest {
         setTwo.add("\\testDirectory\\SubDirectory\\FileTwo.txt");
     }
 
-    private UpdateFilesRQ createUpdateFilesRQSetOne(){
+    private UpdateFilesRQ createUpdateFilesRQSetOne() {
         List<UpdateFile> updateFileList = new ArrayList<>();
-        for(String filePath : setOne){
+        for (String filePath : setOne) {
             File file = new File(userAbsolutePath + filePath);
             UpdateFile updateFile = new UpdateFile();
             updateFile.setFilePath(filePath);
             updateFile.setLastModified(String.valueOf(file.lastModified()));
+            updateFile.setAction("TEST");
             updateFileList.add(updateFile);
         }
         UpdateFilesRQ updateFilesRQ = new UpdateFilesRQ();
         updateFilesRQ.setUpdateFile(updateFileList);
+        updateFilesRQ.setHost(hostName);
+        return updateFilesRQ;
+    }
+
+    private UpdateFilesRQ createUpdateFilesRQSetTwo() {
+        List<UpdateFile> updateFileList = new ArrayList<>();
+        for (String filePath : setTwo) {
+            File file = new File(userAbsolutePath + filePath);
+            UpdateFile updateFile = new UpdateFile();
+            updateFile.setFilePath(filePath);
+            updateFile.setLastModified(String.valueOf(file.lastModified()));
+            updateFile.setAction("TEST");
+            updateFileList.add(updateFile);
+        }
+        UpdateFilesRQ updateFilesRQ = new UpdateFilesRQ();
+        updateFilesRQ.setUpdateFile(updateFileList);
+        updateFilesRQ.setHost(hostName);
         return updateFilesRQ;
     }
 
