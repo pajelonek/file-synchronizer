@@ -133,20 +133,20 @@ public class FileChangesLoggerTest {
         createSetOne();
         try {
             File directory = new File(userAbsolutePath + "/testDirectory");
-            if(!directory.exists()) {
+            if (!directory.exists()) {
                 if (directory.mkdir())
                     logger.info("Successfully created test directory '{}/testDirectory'", userAbsolutePath);
                 else throw new Error("Could not create directory");
                 directory.deleteOnExit();
             } else logger.info("Test directory '{}/testDirectory' already exists", userAbsolutePath);
             File subDirectory = new File(userAbsolutePath + "/testDirectory/SubDirectory");
-            if(!subDirectory.exists()) {
+            if (!subDirectory.exists()) {
                 if (subDirectory.mkdir())
                     logger.info("Successfully created test directory '{}/testDirectory/SubDirectory'", userAbsolutePath);
                 else throw new Error("Could not create directory");
                 subDirectory.deleteOnExit();
             } else logger.info("Test directory '{}/testDirectory/SubDirectory' already exists", userAbsolutePath);
-            for(String filePath : setOne){
+            for (String filePath : setOne) {
                 File file = new File(userAbsolutePath + filePath);
                 FileUtils.touch(file);
                 file.deleteOnExit();
@@ -157,7 +157,7 @@ public class FileChangesLoggerTest {
         }
     }
 
-    private void createSetOne(){
+    private void createSetOne() {
         setOne = new ArrayList<>();
         setOne.add("/testDirectory/fileOne.txt");
         setOne.add("/testDirectory/fileTwo.txt");
@@ -168,21 +168,20 @@ public class FileChangesLoggerTest {
         createSetTwo();
         try {
             File directory = new File(userAbsolutePath + "/testDirectory");
-            if(!directory.exists()) {
+            if (!directory.exists()) {
                 if (directory.mkdir())
                     logger.info("Successfully created test directory '{}/testDirectory'", userAbsolutePath);
                 else throw new Error("Could not create directory");
                 directory.deleteOnExit();
-            }
-            else logger.info("Test directory '{}/testDirectory' already exists", userAbsolutePath);
+            } else logger.info("Test directory '{}/testDirectory' already exists", userAbsolutePath);
             File subDirectory = new File(userAbsolutePath + "/testDirectory/SubDirectory");
-            if(!subDirectory.exists()) {
+            if (!subDirectory.exists()) {
                 if (subDirectory.mkdir())
                     logger.info("Successfully created test directory '{}/testDirectory/SubDirectory'", userAbsolutePath);
                 else throw new Error("Could not create directory");
                 subDirectory.deleteOnExit();
-            }  logger.info("Test directory '{}/testDirectory' already exists", userAbsolutePath);
-            for(String filePath : setTwo){
+            } else logger.info("Test directory '{}/testDirectory' already exists", userAbsolutePath);
+            for (String filePath : setTwo) {
                 File file = new File(userAbsolutePath + filePath);
                 FileUtils.touch(file);
                 file.deleteOnExit();
@@ -193,7 +192,7 @@ public class FileChangesLoggerTest {
         }
     }
 
-    private void createSetTwo(){
+    private void createSetTwo() {
         setTwo = new ArrayList<>();
         setTwo.add("\\testDirectory\\fileOne.txt");
         setTwo.add("\\testDirectory\\fileTwo.txt");
@@ -201,9 +200,9 @@ public class FileChangesLoggerTest {
         setTwo.add("\\testDirectory\\SubDirectory\\FileTwo.txt");
     }
 
-    private UpdateFilesRQ createUpdateFilesRQSetOne(){
+    private UpdateFilesRQ createUpdateFilesRQSetOne() {
         List<UpdateFile> updateFileList = new ArrayList<>();
-        for(String filePath : setOne){
+        for (String filePath : setOne) {
             File file = new File(userAbsolutePath + filePath);
             UpdateFile updateFile = new UpdateFile();
             updateFile.setFilePath(filePath);
@@ -217,9 +216,9 @@ public class FileChangesLoggerTest {
         return updateFilesRQ;
     }
 
-    private UpdateFilesRQ createUpdateFilesRQSetTwo(){
+    private UpdateFilesRQ createUpdateFilesRQSetTwo() {
         List<UpdateFile> updateFileList = new ArrayList<>();
-        for(String filePath : setTwo){
+        for (String filePath : setTwo) {
             File file = new File(userAbsolutePath + filePath);
             UpdateFile updateFile = new UpdateFile();
             updateFile.setFilePath(filePath);
