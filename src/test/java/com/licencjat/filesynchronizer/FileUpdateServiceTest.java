@@ -37,7 +37,10 @@ public class FileUpdateServiceTest {
 
     private List<String> setOne;
     private List<String> setTwo;
+    private List<String> setOneDirectoryList;
+    private List<String> setTwoDirectoryList;
     private final String hostName = "TEST";
+    private final String mainTestDirectory = "/testDirectory";
 
     @Test
     public void removeFilesTestSetOne() {
@@ -205,21 +208,13 @@ public class FileUpdateServiceTest {
 
     private void createResourcesFilesSetOne() {
         createSetOne();
+        createSetOneDirectoryList();
         try {
-            File directory = new File(userAbsolutePath + "/testDirectory");
-            if (!directory.exists()) {
-                if (directory.mkdir())
-                    logger.info("Successfully created test directory '{}/testDirectory'", userAbsolutePath);
-                else throw new Error("Could not create directory");
-                directory.deleteOnExit();
-            } else logger.info("Test directory '{}/testDirectory' already exists", userAbsolutePath);
-            File subDirectory = new File(userAbsolutePath + "/testDirectory/SubDirectory");
-            if (!subDirectory.exists()) {
-                if (subDirectory.mkdir())
-                    logger.info("Successfully created test directory '{}/testDirectory/SubDirectory'", userAbsolutePath);
-                else throw new Error("Could not create directory");
-                subDirectory.deleteOnExit();
-            } else logger.info("Test directory '{}/testDirectory/SubDirectory' already exists", userAbsolutePath);
+            createDirectory(userAbsolutePath + mainTestDirectory);
+            for (String directory : setOneDirectoryList) {
+                createDirectory(userAbsolutePath + mainTestDirectory + directory);
+            }
+
             for (String filePath : setOne) {
                 File file = new File(userAbsolutePath + filePath);
                 FileUtils.touch(file);
@@ -238,23 +233,21 @@ public class FileUpdateServiceTest {
         setOne.add("/testDirectory/SubDirectory/FileOne.txt");
     }
 
+    private void createSetOneDirectoryList() {
+        setOneDirectoryList = new ArrayList<>();
+        setOneDirectoryList.add("/SubDirectory");
+        setOneDirectoryList.add("/SubDirectory/SubSubDirectory");
+    }
+
     private void createResourcesFilesSetTwo() {
         createSetTwo();
+        createSetTwoDirectoryList();
         try {
-            File directory = new File(userAbsolutePath + "/testDirectory");
-            if (!directory.exists()) {
-                if (directory.mkdir())
-                    logger.info("Successfully created test directory '{}/testDirectory'", userAbsolutePath);
-                else throw new Error("Could not create directory");
-                directory.deleteOnExit();
-            } else logger.info("Test directory '{}/testDirectory' already exists", userAbsolutePath);
-            File subDirectory = new File(userAbsolutePath + "/testDirectory/SubDirectory");
-            if (!subDirectory.exists()) {
-                if (subDirectory.mkdir())
-                    logger.info("Successfully created test directory '{}/testDirectory/SubDirectory'", userAbsolutePath);
-                else throw new Error("Could not create directory");
-                subDirectory.deleteOnExit();
-            } else logger.info("Test directory '{}/testDirectory' already exists", userAbsolutePath);
+            createDirectory(userAbsolutePath + mainTestDirectory);
+            for (String directory : setTwoDirectoryList) {
+                createDirectory(userAbsolutePath + mainTestDirectory + directory);
+            }
+
             for (String filePath : setTwo) {
                 File file = new File(userAbsolutePath + filePath);
                 FileUtils.touch(file);
@@ -272,6 +265,12 @@ public class FileUpdateServiceTest {
         setTwo.add("\\testDirectory\\fileTwo.txt");
         setTwo.add("\\testDirectory\\SubDirectory\\FileOne.txt");
         setTwo.add("\\testDirectory\\SubDirectory\\FileTwo.txt");
+    }
+
+    private void createSetTwoDirectoryList() {
+        setTwoDirectoryList = new ArrayList<>();
+        setTwoDirectoryList.add("/SubDirectory");
+        setTwoDirectoryList.add("/SubDirectory/SubSubDirectory");
     }
 
     private UpdateFilesRQ createUpdateFilesRQSetOne() {
@@ -310,5 +309,16 @@ public class FileUpdateServiceTest {
         UpdateFilesRQ updateFilesRQ = new UpdateFilesRQ();
         updateFilesRQ.setUpdateFile(new ArrayList<>());
         return updateFilesRQ;
+    }
+
+    void createDirectory(String path) {
+        File directory = new File(path);
+        if (!directory.exists()) {
+            if (directory.mkdir())
+                logger.info("Successfully created test directory '{}'", path);
+            else throw new Error("Could not create directory");
+            directory.deleteOnExit();
+        } else logger.info("Test directory '{}' already exists", path);
+
     }
 }

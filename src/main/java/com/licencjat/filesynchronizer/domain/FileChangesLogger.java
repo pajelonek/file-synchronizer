@@ -49,4 +49,12 @@ public class FileChangesLogger {
     public void cleanLogFileList() {
         logFileList = new ArrayList<>();
     }
+
+    public List<LogFile> getLogFile() {
+        return logFileList;
+    }
+
+    public void setLogFile(List<LogFile> logFileList) {
+        this.logFileList = logFileList;
+    }
 }

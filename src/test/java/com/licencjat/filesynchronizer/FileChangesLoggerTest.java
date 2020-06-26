@@ -1,6 +1,5 @@
 package com.licencjat.filesynchronizer;
 
-import static org.junit.Assert.*;
 
 import com.licencjat.filesynchronizer.domain.FileChangesLogger;
 import com.licencjat.filesynchronizer.domain.FileUpdaterService;
@@ -9,6 +8,7 @@ import com.licencjat.filesynchronizer.model.updatefiles.LogFile;
 import com.licencjat.filesynchronizer.model.updatefiles.UpdateFile;
 import com.licencjat.filesynchronizer.model.updatefiles.UpdateFilesRQ;
 import org.apache.commons.io.FileUtils;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,6 +23,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 
 @SpringBootTest
@@ -41,8 +43,18 @@ public class FileChangesLoggerTest {
 
     private List<String> setOne;
     private List<String> setTwo;
+    private List<String> setOneDirectoryList;
+    private List<String> setTwoDirectoryList;
     private final String hostName = "TEST";
     private final String action = "TEST";
+    private final String mainTestDirectory = "/testDirectory";
+
+    @Test
+    @Order(1)
+    void contextLoads() {
+        assertThat(fileChangesLogger).isNotNull();
+        assertThat(fileUpdaterService).isNotNull();
+    }
 
     @Test
     public void addLogFileSetOne() {
@@ -58,22 +70,22 @@ public class FileChangesLoggerTest {
 
         //then
         ResponseEntity<FileLogger> fileLoggerResponseEntity = fileChangesLogger.getLogFileList();
-        assertEquals(fileLoggerResponseEntity.getStatusCodeValue(), 200);
+        assertThat(fileLoggerResponseEntity.getStatusCodeValue()).isEqualTo(200);
 
-        assertEquals(setOne.size(), Objects.requireNonNull(fileLoggerResponseEntity.getBody()).getLogFileList().size());
+        assertThat(Objects.requireNonNull(fileLoggerResponseEntity.getBody()).getLogFileList().size()).isEqualTo(setOne.size());
         List<String> fileListFromLogger = fileLoggerResponseEntity.getBody().getLogFileList().stream()
                 .map(LogFile::getFilePath)
                 .collect(Collectors.toList());
-        assertEquals(setOne, fileListFromLogger);
+        assertThat(setOne).isEqualTo(fileListFromLogger);
+
         List<String> fileNamesFromLogger = fileLoggerResponseEntity.getBody().getLogFileList().stream()
                 .map(LogFile::getFilePath)
                 .collect(Collectors.toList());
-        assertEquals(setOne, fileNamesFromLogger);
+        assertThat(setOne).isEqualTo(fileNamesFromLogger);
 
         boolean testFieldsAreCorrect = fileLoggerResponseEntity.getBody().getLogFileList().stream()
                 .allMatch(logFile -> logFile.getAction().equals(hostName) && logFile.getHost().equals(action));
-        assertTrue(testFieldsAreCorrect);
-
+        assertThat(testFieldsAreCorrect).isTrue();
         fileChangesLogger.cleanLogFileList();
     }
 
@@ -91,17 +103,16 @@ public class FileChangesLoggerTest {
 
         //then
         ResponseEntity<FileLogger> fileLoggerResponseEntity = fileChangesLogger.getLogFileList();
-        assertEquals(fileLoggerResponseEntity.getStatusCodeValue(), 200);
+        assertThat(fileLoggerResponseEntity.getStatusCodeValue()).isEqualTo(200);
 
-        assertEquals(setTwo.size(), Objects.requireNonNull(fileLoggerResponseEntity.getBody()).getLogFileList().size());
+        assertThat(Objects.requireNonNull(fileLoggerResponseEntity.getBody()).getLogFileList().size()).isEqualTo(setTwo.size());
         List<String> fileListFromLogger = fileLoggerResponseEntity.getBody().getLogFileList().stream()
                 .map(LogFile::getFilePath)
                 .collect(Collectors.toList());
-        assertEquals(setTwo, fileListFromLogger);
+        assertThat(setTwo).isEqualTo(fileListFromLogger);
         boolean testFieldsAreCorrect = fileLoggerResponseEntity.getBody().getLogFileList().stream()
                 .allMatch(logFile -> logFile.getAction().equals(hostName) && logFile.getHost().equals(action));
-        assertTrue(testFieldsAreCorrect);
-
+        assertThat(testFieldsAreCorrect).isTrue();
         fileChangesLogger.cleanLogFileList();
     }
 
@@ -116,36 +127,27 @@ public class FileChangesLoggerTest {
 
         //then
         ResponseEntity<FileLogger> fileLoggerResponseEntity = fileChangesLogger.getLogFileList();
-        assertEquals(fileLoggerResponseEntity.getStatusCodeValue(), 200);
+        assertThat(fileLoggerResponseEntity.getStatusCodeValue()).isEqualTo(200);
 
         List<String> fileListFromLogger = Objects.requireNonNull(fileLoggerResponseEntity.getBody()).getLogFileList().stream()
                 .map(LogFile::getFilePath)
                 .collect(Collectors.toList());
 
-        assertEquals(fileListFromLogger, setTwo);
-
+        assertThat(fileListFromLogger).isEqualTo(setTwo);
         boolean testFieldsAreCorrect = fileLoggerResponseEntity.getBody().getLogFileList().stream()
                 .allMatch(logFile -> logFile.getAction().equals(hostName) && logFile.getHost().equals(action));
-        assertTrue(testFieldsAreCorrect);
+        assertThat(testFieldsAreCorrect).isTrue();
     }
 
     private void createResourcesFilesSetOne() {
         createSetOne();
+        createSetOneDirectoryList();
         try {
-            File directory = new File(userAbsolutePath + "/testDirectory");
-            if (!directory.exists()) {
-                if (directory.mkdir())
-                    logger.info("Successfully created test directory '{}/testDirectory'", userAbsolutePath);
-                else throw new Error("Could not create directory");
-                directory.deleteOnExit();
-            } else logger.info("Test directory '{}/testDirectory' already exists", userAbsolutePath);
-            File subDirectory = new File(userAbsolutePath + "/testDirectory/SubDirectory");
-            if (!subDirectory.exists()) {
-                if (subDirectory.mkdir())
-                    logger.info("Successfully created test directory '{}/testDirectory/SubDirectory'", userAbsolutePath);
-                else throw new Error("Could not create directory");
-                subDirectory.deleteOnExit();
-            } else logger.info("Test directory '{}/testDirectory/SubDirectory' already exists", userAbsolutePath);
+            createDirectory(userAbsolutePath + mainTestDirectory);
+            for (String directory : setOneDirectoryList) {
+                createDirectory(userAbsolutePath + mainTestDirectory + directory);
+            }
+
             for (String filePath : setOne) {
                 File file = new File(userAbsolutePath + filePath);
                 FileUtils.touch(file);
@@ -164,23 +166,21 @@ public class FileChangesLoggerTest {
         setOne.add("/testDirectory/SubDirectory/FileOne.txt");
     }
 
+    private void createSetOneDirectoryList() {
+        setOneDirectoryList = new ArrayList<>();
+        setOneDirectoryList.add("/SubDirectory");
+        setOneDirectoryList.add("/SubDirectory/SubSubDirectory");
+    }
+
     private void createResourcesFilesSetTwo() {
         createSetTwo();
+        createSetTwoDirectoryList();
         try {
-            File directory = new File(userAbsolutePath + "/testDirectory");
-            if (!directory.exists()) {
-                if (directory.mkdir())
-                    logger.info("Successfully created test directory '{}/testDirectory'", userAbsolutePath);
-                else throw new Error("Could not create directory");
-                directory.deleteOnExit();
-            } else logger.info("Test directory '{}/testDirectory' already exists", userAbsolutePath);
-            File subDirectory = new File(userAbsolutePath + "/testDirectory/SubDirectory");
-            if (!subDirectory.exists()) {
-                if (subDirectory.mkdir())
-                    logger.info("Successfully created test directory '{}/testDirectory/SubDirectory'", userAbsolutePath);
-                else throw new Error("Could not create directory");
-                subDirectory.deleteOnExit();
-            } else logger.info("Test directory '{}/testDirectory' already exists", userAbsolutePath);
+            createDirectory(userAbsolutePath + mainTestDirectory);
+            for (String directory : setTwoDirectoryList) {
+                createDirectory(userAbsolutePath + mainTestDirectory + directory);
+            }
+
             for (String filePath : setTwo) {
                 File file = new File(userAbsolutePath + filePath);
                 FileUtils.touch(file);
@@ -198,6 +198,12 @@ public class FileChangesLoggerTest {
         setTwo.add("\\testDirectory\\fileTwo.txt");
         setTwo.add("\\testDirectory\\SubDirectory\\FileOne.txt");
         setTwo.add("\\testDirectory\\SubDirectory\\FileTwo.txt");
+    }
+
+    private void createSetTwoDirectoryList() {
+        setTwoDirectoryList = new ArrayList<>();
+        setTwoDirectoryList.add("/SubDirectory");
+        setTwoDirectoryList.add("/SubDirectory/SubSubDirectory");
     }
 
     private UpdateFilesRQ createUpdateFilesRQSetOne() {
@@ -230,5 +236,16 @@ public class FileChangesLoggerTest {
         updateFilesRQ.setUpdateFile(updateFileList);
         updateFilesRQ.setHost(hostName);
         return updateFilesRQ;
+    }
+
+    void createDirectory(String path) {
+        File directory = new File(path);
+        if (!directory.exists()) {
+            if (directory.mkdir())
+                logger.info("Successfully created test directory '{}'", path);
+            else throw new Error("Could not create directory");
+            directory.deleteOnExit();
+        } else logger.info("Test directory '{}' already exists", path);
+
     }
 }
