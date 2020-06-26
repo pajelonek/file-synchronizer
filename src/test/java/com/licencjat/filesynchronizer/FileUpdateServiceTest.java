@@ -167,15 +167,16 @@ public class FileUpdateServiceTest {
 
         boolean result = updateFileList.stream().allMatch(file -> Long.parseLong(file.getLastModified()) > 0);
         assertTrue(result);
+        fileChangesLogger.cleanLogFileList();
     }
 
     @Test
-    public void setModificationDateTestSetOne() {
+    public void setModificationDateTestSetTwo() {
         //when
-        createResourcesFilesSetOne();
+        createResourcesFilesSetTwo();
 
         //given
-        UpdateFilesRQ updateFilesRQ = createUpdateFilesRQSetOne();
+        UpdateFilesRQ updateFilesRQ = createUpdateFilesRQSetTwo();
         List<String> modificationDateList = fileUpdaterService.getServerFileList(userAbsolutePath + "\\testDirectory\\").stream()
                 .map(UpdateFile::getLastModified)
                 .collect(Collectors.toList());
@@ -183,7 +184,7 @@ public class FileUpdateServiceTest {
         //then
         ResponseEntity<UpdateFilesRS> responseEntity = fileUpdaterService.setModificationDates(updateFilesRQ);
         assertEquals(responseEntity.getStatusCodeValue(), 200);
-        assertEquals(Objects.requireNonNull(responseEntity.getBody()).getUpdateFile().size(), setOne.size());
+        assertEquals(Objects.requireNonNull(responseEntity.getBody()).getUpdateFile().size(), setTwo.size());
         assertEquals(responseEntity.getBody().getStatus(), "ok");
         List<String> modificationDateListAfterRequest = responseEntity.getBody().getUpdateFile().stream()
                 .map(UpdateFileStatus::getLastModified)
@@ -199,8 +200,8 @@ public class FileUpdateServiceTest {
         List<String> setOneFromLogger = logFileList.stream()
                 .map(LogFile::getFilePath)
                 .collect(Collectors.toList());
-        assertEquals(setOne, setOneFromLogger);
-        assertEquals(setOne.size(), setOneFromLogger.size());
+        assertEquals(setTwo, setOneFromLogger);
+        assertEquals(setTwo.size(), setOneFromLogger.size());
 
         fileChangesLogger.cleanLogFileList();
     }

@@ -137,6 +137,7 @@ public class FileChangesLoggerTest {
         boolean testFieldsAreCorrect = fileLoggerResponseEntity.getBody().getLogFileList().stream()
                 .allMatch(logFile -> logFile.getAction().equals(hostName) && logFile.getHost().equals(action));
         assertThat(testFieldsAreCorrect).isTrue();
+        fileChangesLogger.cleanLogFileList();
     }
 
     private void createResourcesFilesSetOne() {
