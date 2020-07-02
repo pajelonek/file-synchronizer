@@ -36,7 +36,7 @@ public class FileChangesLoggerTest {
     @Autowired
     FileUpdaterService fileUpdaterService;
 
-    @Value("${user.absolute.path}")
+    @Value("${server.absolute.path}")
     private String userAbsolutePath;
 
     Logger logger = LoggerFactory.getLogger(FileUpdateServiceTest.class);

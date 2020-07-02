@@ -21,11 +21,8 @@ import java.util.*;
 @Component
 public class FileUpdaterService {
 
-    @Value("${user.remote.directory}")
-    private String userRemoteDirectory;
-
-    @Value("${user.absolute.path}")
-    private String userAbsolutePath;
+    @Value("${server.absolute.path}")
+    private String serverDirectoryFullPath;
 
     private final FileChangesLogger fileChangesLogger;
 
@@ -57,15 +54,19 @@ public class FileUpdaterService {
     }
 
     private String cutPrefixFromFilePath(String path) {
-        return path.replace(userAbsolutePath, "");
+        return path.replace(serverDirectoryFullPath, "");
     }
 
     public ResponseEntity<UpdateFilesRQ> getFileList() {
         UpdateFilesRQ getFileListRS = new UpdateFilesRQ();
         getFileListRS.setName("UpdateFilesRQ");
-        getFileListRS.setMainFolder(userRemoteDirectory);
-        getFileListRS.setUpdateFile(getServerFileList(userAbsolutePath));
+        getFileListRS.setMainFolder(cutMainDirectoryFromPath(serverDirectoryFullPath));
+        getFileListRS.setUpdateFile(getServerFileList(serverDirectoryFullPath));
         return ResponseEntity.ok().body(getFileListRS);
+    }
+
+    private String cutMainDirectoryFromPath(String serverMainDirectory) {
+        return serverMainDirectory.replace(serverDirectoryFullPath.subSequence(0, serverDirectoryFullPath.lastIndexOf("\\")), "");
     }
 
     public ResponseEntity<UpdateFilesRS> setModificationDates(UpdateFilesRQ updateFilesRQ) {
@@ -75,7 +76,7 @@ public class FileUpdaterService {
             UpdateFileStatus updateFileStatus = new UpdateFileStatus();
             updateFileStatus.setFilePath(fileRQ.getFilePath());
             logger.info("Changing modification date for file: " + fileRQ.getFilePath());
-            File file = new File(userAbsolutePath + fileRQ.getFilePath());
+            File file = new File(serverDirectoryFullPath + fileRQ.getFilePath());
             if (file.exists() && file.setLastModified(Long.parseLong(fileRQ.getLastModified()))) {
                 updateFileStatus.setStatus("OK");
                 updateFileStatus.setLastModified(String.valueOf(file.lastModified()));
@@ -99,7 +100,7 @@ public class FileUpdaterService {
             UpdateFileStatus updateFileStatus = new UpdateFileStatus();
             updateFileStatus.setFilePath(fileRQ.getFilePath());
             logger.info("Removing file: " + fileRQ.getFilePath());
-            File file = new File(userAbsolutePath + fileRQ.getFilePath());
+            File file = new File(serverDirectoryFullPath + fileRQ.getFilePath());
             if (file.exists() && file.delete()) {
                 updateFileStatus.setStatus("OK");
                 logger.info("Successfully deleted file on server: " + fileRQ.getFilePath());
