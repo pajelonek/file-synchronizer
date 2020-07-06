@@ -24,6 +24,9 @@ public class FileUpdaterService {
     @Value("${server.absolute.path}")
     private String serverDirectoryFullPath;
 
+    @Value("${server.ssh.path}")
+    private String serverSshPath;
+
     private final FileChangesLogger fileChangesLogger;
 
     Logger logger = LoggerFactory.getLogger(FileUpdaterService.class);
@@ -60,13 +63,13 @@ public class FileUpdaterService {
     public ResponseEntity<UpdateFilesRQ> getFileList() {
         UpdateFilesRQ getFileListRS = new UpdateFilesRQ();
         getFileListRS.setName("UpdateFilesRQ");
-        getFileListRS.setMainFolder(cutMainDirectoryFromPath(serverDirectoryFullPath));
+        getFileListRS.setMainFolder(serverSshPath);
         getFileListRS.setUpdateFile(getServerFileList(serverDirectoryFullPath));
         return ResponseEntity.ok().body(getFileListRS);
     }
 
     private String cutMainDirectoryFromPath(String serverMainDirectory) {
-        return serverMainDirectory.replace(serverDirectoryFullPath.subSequence(0, serverDirectoryFullPath.lastIndexOf("\\")), "");
+        return serverMainDirectory.replace(serverDirectoryFullPath.subSequence(0, serverDirectoryFullPath.lastIndexOf("\\")+1), "");
     }
 
     public ResponseEntity<UpdateFilesRS> setModificationDates(UpdateFilesRQ updateFilesRQ) {
