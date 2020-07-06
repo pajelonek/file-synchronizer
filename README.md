@@ -32,7 +32,8 @@ logging.level.root=INFO /* For futher development change to DEBUG */
 server.address=0.0.0.0 /* It will automount server ip to users */
 server.port=8888  /* Choose any free port to use */
 server.absolute.path=C:\\Users\\pawst\\serverFiles /* An example of how to provide path
-where our application will stores files */
+where our application will stores files, your directory needs to be in your user directory */
+server.ssh.path=serverFiles /* Path to your directory for ssh, cut everything to your USERNAME */
 cleaning.log.file.interval=120  /* Interval of how often server cleans his log list needed to 
 inform clients about changes from other clients. Should be at least two times greater that pooler
 interval from client */
