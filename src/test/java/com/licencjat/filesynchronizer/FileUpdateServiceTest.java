@@ -182,7 +182,7 @@ public class FileUpdateServiceTest {
                 .collect(Collectors.toList());
 
         //then
-        ResponseEntity<UpdateFilesRS> responseEntity = fileUpdaterService.setModificationDates(updateFilesRQ);
+        ResponseEntity<UpdateFilesRS> responseEntity = fileUpdaterService.registerFiles(updateFilesRQ);
         assertEquals(responseEntity.getStatusCodeValue(), 200);
         assertEquals(Objects.requireNonNull(responseEntity.getBody()).getUpdateFile().size(), setTwo.size());
         assertEquals(responseEntity.getBody().getStatus(), "ok");

@@ -123,7 +123,7 @@ public class FileChangesLoggerTest {
 
         //given
         UpdateFilesRQ updateFilesRQ = createUpdateFilesRQSetTwo();
-        fileUpdaterService.setModificationDates(updateFilesRQ);
+        fileUpdaterService.registerFiles(updateFilesRQ);
 
         //then
         ResponseEntity<FileLogger> fileLoggerResponseEntity = fileChangesLogger.getLogFileList();

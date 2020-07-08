@@ -37,9 +37,9 @@ public class RestClientController {
     }
 
 
-    @PostMapping(value = "/setModificationDate", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<UpdateFilesRS> setModificationDates(@RequestBody UpdateFilesRQ updateFilesRQ) {
-        return fileUpdaterService.setModificationDates(updateFilesRQ);
+    @PostMapping(value = "/registerFiles", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<UpdateFilesRS> registerFiles(@RequestBody UpdateFilesRQ updateFilesRQ) {
+        return fileUpdaterService.registerFiles(updateFilesRQ);
     }
 
     @PostMapping(value = "/removeFiles", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)

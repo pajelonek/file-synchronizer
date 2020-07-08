@@ -68,31 +68,15 @@ public class FileUpdaterService {
         return ResponseEntity.ok().body(getFileListRS);
     }
 
-    private String cutMainDirectoryFromPath(String serverMainDirectory) {
-        return serverMainDirectory.replace(serverDirectoryFullPath.subSequence(0, serverDirectoryFullPath.lastIndexOf("\\")+1), "");
-    }
-
-    public ResponseEntity<UpdateFilesRS> setModificationDates(UpdateFilesRQ updateFilesRQ) {
-        List<UpdateFileStatus> updateFilesStatusList = new ArrayList<>();
-        List<UpdateFile> updateFile = updateFilesRQ.getUpdateFile();
-        for (UpdateFile fileRQ : updateFile) {
-            UpdateFileStatus updateFileStatus = new UpdateFileStatus();
-            updateFileStatus.setFilePath(fileRQ.getFilePath());
-            logger.info("Changing modification date for file: " + fileRQ.getFilePath());
-            File file = new File(serverDirectoryFullPath + fileRQ.getFilePath());
-            if (file.exists() && file.setLastModified(Long.parseLong(fileRQ.getLastModified()))) {
-                updateFileStatus.setStatus("OK");
-                updateFileStatus.setLastModified(String.valueOf(file.lastModified()));
-                logger.info("Successfully modified date for file: " + fileRQ.getFilePath());
-                fileChangesLogger.addLogFile(fileRQ, updateFilesRQ.getHost());
-            } else {
-                logger.info("Could not modified file on server: " + fileRQ.getFilePath());
-                updateFileStatus.setStatus("ERROR");
+    public ResponseEntity<UpdateFilesRS> registerFiles(UpdateFilesRQ updateFilesRQ) {
+        List<UpdateFile> updateFileList = updateFilesRQ.getUpdateFile();
+        UpdateFilesRS updateFilesRS = new UpdateFilesRS();
+        updateFilesRS.setStatus("ok");
+        if(!updateFileList.isEmpty()) {
+            for (UpdateFile updateFile : updateFileList) {
+                fileChangesLogger.addLogFile(updateFile, updateFilesRQ.getHost());
             }
-            updateFilesStatusList.add(updateFileStatus);
         }
-
-        UpdateFilesRS updateFilesRS = createUpdateFilesRS(updateFilesStatusList);
         return ResponseEntity.ok().body(updateFilesRS);
     }
 
