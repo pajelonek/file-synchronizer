@@ -82,18 +82,18 @@ public class FileUpdaterService {
 
     public ResponseEntity<UpdateFilesRS> removeFiles(UpdateFilesRQ updateFilesRQ) {
         List<UpdateFileStatus> updateFilesStatusList = new ArrayList<>();
-        List<UpdateFile> updateFile = updateFilesRQ.getUpdateFile();
-        for (UpdateFile fileRQ : updateFile) {
+        List<UpdateFile> updateFileList = updateFilesRQ.getUpdateFile();
+        for (UpdateFile updateFile : updateFileList) {
             UpdateFileStatus updateFileStatus = new UpdateFileStatus();
-            updateFileStatus.setFilePath(fileRQ.getFilePath());
-            logger.info("Removing file: " + fileRQ.getFilePath());
-            File file = new File(serverDirectoryFullPath + fileRQ.getFilePath());
+            updateFileStatus.setFilePath(updateFile.getFilePath());
+            logger.info("Removing file: " + updateFile.getFilePath());
+            File file = new File(serverDirectoryFullPath + updateFile.getFilePath());
             if (file.exists() && file.delete()) {
                 updateFileStatus.setStatus("OK");
-                logger.info("Successfully deleted file on server: " + fileRQ.getFilePath());
-                fileChangesLogger.addLogFile(fileRQ, updateFilesRQ.getHost());
+                logger.info("Successfully deleted file on server: " + updateFile.getFilePath());
+                fileChangesLogger.addLogFile(updateFile, updateFilesRQ.getHost());
             } else {
-                logger.info("Could not remove file on server: " + fileRQ.getFilePath());
+                logger.info("Could not remove file on server: " + updateFile.getFilePath());
                 updateFileStatus.setStatus("ERROR");
             }
             updateFilesStatusList.add(updateFileStatus);
