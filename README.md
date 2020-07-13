@@ -1,117 +1,127 @@
-# File-synchronizer server
+#	Instrukcja uruchamiania aplikacji serwerowej
 
-It's server side of the project regarding file synchronizing through ssh with rsync on Windows 10.
+Kolejne kroki przeprowadzają użytkownika przez proces konfiguracyjny aplikacji serwerowe. Konfiguracja tej części jako 
+pierwszej jest zalecana z powodu zależnych od siebie w kolejności kroków. W zależności od zabezpieczeń sieci oraz 
+komputera, istnieje prawdopodobieństwo na dopasowanie instrukcji do posiadanego sprzętu.
 
-Server performs scanning a directory where we store our files to share and gives client information on
-how to manage their files as well as what actions performed other clients. The communication is based 
-on REST architecture and all actions to server are ssh based.
-
-Except installing necessary feature it is required to configure application.properties file as well as ssh configuration
-which is described below.
-
-## Prerequisites
-Make sure you have installed all of the following prerequisites on your development machine:
-* Git - [Download & Install Git](https://git-scm.com/downloads). OSX and Linux machines typically have this already installed.
-* Maven - [Download & Install Maven](https://maven.apache.org/) - Dependency Management
-* OpenSSH Server - [Download & Install OpenSSH Server](https://www.bleepingcomputer.com/news/microsoft/how-to-install-the-built-in-windows-10-openssh-server/). Windows 10 should already have this feature
-enabled. Only install this system feature, configuration will be described below.
-* Java - [Download & Install Java](https://www.oracle.com/java/technologies/javase/javase-jdk8-downloads.html) - Runtime Environment essential to run application. At least 1.8 version. 
+## Prerekwizyty
+Upewnij się, że zgodnie z częścią teoretyczną pracy posiadasz skonfigurowane narzędzia:
+* Git - [Download & Install Git](https://git-scm.com/downloads)
+* Maven - [Download & Install Maven](https://maven.apache.org/)
+* OpenSSH Server - [Download & Install OpenSSH Server](https://www.bleepingcomputer.com/news/microsoft/how-to-install-the-built-in-windows-10-openssh-server/).
+* Java - [Download & Install Java](https://www.oracle.com/java/technologies/javase/javase-jdk8-downloads.html) 
 
 
-## Clone repository
-To clone repository copy link from github, run git, go to the directory where you want
-to copy repository and then type:
+###1.	Konfiguracja pliku  application-properties
+Kiedy użytkownik wypakuje pliki do lokacji posiadającej wolne miejsce na dysku, pierwszym krokiem konfiguracyjnym jest 
+ustawienie wartości właściwości w pliku application-properties. Plik ten znajduje się w ścieżce:
+file-synchronizer\src\main\resources\application-properties
 
-```
-git clone [copied link from github]
-```
-
-### Configuration of application-properties
-```
-logging.level.root=INFO /* For futher development change to DEBUG */
-server.address=0.0.0.0 /* It will automount server ip to users */
-server.port=8888  /* Choose any free port to use */
-server.absolute.path=C:\\Users\\pawst\\serverFiles /* An example of how to provide path
-where our application will stores files, your directory needs to be in your user directory */
-server.ssh.path=serverFiles /* Path to your directory for ssh, cut everything to your USERNAME */
-cleaning.log.file.interval=120  /* Interval of how often server cleans his log list needed to 
-inform clients about changes from other clients. Should be at least two times greater that pooler
-interval from client */
-```
-
-### Installing
-
-A step by step series of examples that tell you how to get a development env running
-
-Firstly we need to install project along with all required dependencies:
-
-Go to the folder where you cloned repository and run:
-```
-mvn clean install
-```
-If build completed successfully, we need to configure ssh along with rsync.
-
-## SSH Server configuration
-If you haven't installed OpenSSH Server yet, it is essential for application to work.
-I recommend enabling system feature: [Download & Install OpenSSH Server](https://www.bleepingcomputer.com/news/microsoft/how-to-install-the-built-in-windows-10-openssh-server/)
-After it got installed, go to run tab and type: 
+Jest to zwykły plik tekstowy, korzystający z wbudowanych właściwości pozwalający na definiowanie nowych przez użytkownika.
  ```
-services.msc 
-```
-and turn-on OpenSSH Server(it is also recommended enabling auto-start). It is by default turned-off.
-
-
-Go to your User Directory under C:/Users/User and create a directory with name ".ssh".
-Now open Git and go to C:/Users/User/.ssh/ and run:
-```
-touch authorized_keys
-```
-you can as well open any text editor e.g. Notepad++ and create a file
-"authorized_keys" without extension inside mentioned directory(.ssh).
-
-#####It is important to change permissions for "authorized_keys" file. 
-To correctly change permissions for a file:
-- Open properties
-- Go to security
-- Open Advanced
-- Disable inheritance
-- Delete all users permissions EXCEPT SYSTEM AND YOURS USER
-- Click confirm
-
-
-##### You will need to copy public keys from your ssh users to this file.
-
-## Rsync configuration
-In this project clients use rsync to send files. On server side we need to add rsync binaries
-to the systems variables path.
-
-The safest option is to copy binaries from src/main/java/resources/bin.zip.
-Choose where you want to store binaries, unpack them and add to your environment variable "Path" your_new_path/bin.
-Validate if you added binaries successfully by running in cmd:
-```
-rsync --version
-```
-If you receive a current version of rsync, configuration went properly.
-### Running tests
-
-To run tests go to your repository directory and run:
-```
-mvn test
-```
-### Deployment
-
-If you want to create an executable jar with all dependencies to deploy application on server type:
-
-```
-mvn clean package spring-boot:repackage
-```
-
-The jar file will be created in /target directory as file-synchronizer-SNAPSHOT.jar.
-
-To run application:
+logging.level.root = INFO  
+server.address = 0.0.0.0  
+server.port = 8888  
+server.absolute.path = C:\\Users\\Username\\randomDirectory\\serverFiles  
+server.ssh.path = randomDirectory\\serverFiles  
+cleaning.log.file.interval = 120  
  ```
-java -jar file-synchronizer-SNAPSHOT.jar
+Przedstawiony fragment kodu przedstawia plik należący do rozwiązania wchodzącego w skład kodu źródłowego.
+Do właściwości zdefiniowanych przez Spring należą:
+-	logging.level.root - określa stopień widoczności logów wyświetlanych przez aplikację. Wszystkimi możliwościami 
+podanymi od najmniejszej widoczności są: OFF, FATAL, ERROR, WARN, INFO, DEBUG. TRACE oraz ALL. Zalecane jest 
+pozostawienie domyślnej wartości INFO ponieważ większa widoczność logów powoduje ich mniejszą przejrzystość i zalecana 
+jest w przypadku diagnozowania błędów programisty.
+-	server.address - adres sieciowy, z którego powinien korzystać serwer. W zależności od sieci komputerowej zaleca się 
+ustawienie wartości do swoich potrzeb. 
+-	server.port - port sieciowy, którego powinien użyć serwer.
+Do właściwości zdefiniowanych należą:
+-	server.absolute.path - ścieżka lokalna do folderu, który serwer traktuje jako miejsce przechowywania wspólnych 
+plików dla klientu. Do poprawnego działania rozwiązania, z powodu konfiguracji ssh, wymagane jest wybranie folderu 
+należącego do ścieżki użytkownika lokalnego komputera.
+-	server.ssh.path - ścieżka lokalna do folderu z perspektywy protokołu ssh. Jest to server.absolute.path skrócone o 
+początek C:/Users/Username.
+-	cleaning.log.file.interval - interwał w sekundach, który określa jak po ilu sekundach każda zmiana o modyfikacji
+ pliku przez dowolnego klienta, zostaje skasowana. Zalecane jest pozostawienie domyślnej wartości.
+###2.	Instalacja zależności
+Aby zainstalować potrzebne zależności na stację roboczą, należy otworzyć dowolne okno konsoli, udać się do miejsca 
+wypakowania plików oraz wpisać:
  ```
-## Authors
+mvn clean install  
+  ```
+Spowoduje to pobranie wszystkich pakietów i bibliotek określonych w pliku pom.xml, z którego Apache Maven pobiera 
+informacje co ma zainstalować.
+Jeżeli na ekranie wyświetli się informacja “BUILD SUCCESS”, oznacza to poprawność instalacji zasobów z sieci i możliwość
+ przejścia do kolejnych kroków konfiguracyjnych.
+###3.	Konfiguracja OpenSSH Server
+Po stronie aplikacji serwerowej wymagana jest obecność skonfigurowania serwera ssh. Autor sugeruje wykorzystać wbudowaną
+ opcję systemu instalacji OpenSSH Server. Aby go zainstalować:
+-	Otwórz menu Start
+-	Wyszukaj "Programy i funkcje”
+-	Wybierz opcję “Funkcje opcjonalne”
+-	Kliknij przycisk “Dodaj funkcję”
+-	Znajdź w liście dostępnych funkcji “OpenSSH Server”
+-	Naciśnij “Zainstaluj”
+Po poprawnej instalacji, wyszukaj program “Uruchom” z menu Start i wpisz:
+ ```
+services.msc  
+ ```
+Innym rozwiązaniem jest wpisanie w menu Start “Usługi” i w przypadku poprawnego wyszukania programu, uruchomić go. 
+Następnie należy wyszukać usługę “OpenSSH Server” z dostępnej listy. W dalszej kolejności należy wybrać opcję “Uruchom” 
+oraz z listy rozwijanej “Opcje uruchamiania” wybrać “Automatyczne”.
+###4.	Stwórz plik authorized_keys
+Kolejnym krokiem jest utworzenie folderu “.ssh” w folderze użytkownika stacji roboczej tj. 
+C:/Użytkownicy/Nazwa_Użytkownika/.ssh.
+Następnie otwórz dowolny edytor plików, utwórz plik bez rozszerzenia i nazwij go “authorized_keys”. Będzie on 
+odpowiedzialny za przechowywanie kluczy publicznych. Wspomniany przez autora plik musi znajdować się w wcześniej 
+utworzonym folderze “.ssh”.
+W związku z tym, że komunikacja protokołem ssh wymaga odpowiednich zabezpieczeń, wymagane jest ustawienie poprawnych 
+uprawnień do pliku “authorized_keys”.
+W tym celu:
+1.	Otwórz właściwości pliku
+2.	Wejdź w “Zabezpieczenia”
+3.	Przejdź do “Zaawansowane”
+4.	Kliknij przycisk “Wyłącz dziedziczenie”
+5.	Usuń dostęp wszystkich użytkowników z wyjątkiem użytkownika “System” oraz użytkownika obecnie zalogowanego
+6.	Naciśnij przycisk “Zastosuj”
+Po ustawieniu poprawnych zabezpieczeń, można bezpiecznie przesyłać klucze publiczne z klientów do pliku “authorized_keys”.
+###5.	Konfiguracja rsync
+W rozwiązaniu, jednym z założeń komunikacyjnych jest dostęp stacji roboczej z aplikacją serwera, do programu rsync. W 
+tym celu autor umieścił pliki binarne programu rsync z dystrybucji Cygwina pod ścieżką src/main/java/resources/bin.zip.
+Wybierz dowolną wolną lokalizację, wypakuj tam wspomniane pliki rsync a następnie dodaj tę ścieżkę do zmiennych 
+środowiskowych systemu.
+Aby zweryfikować poprawność dodawania zmiennej, otwórz wiersz linii komend i wpisz:
+  ```
+	rsync --version  
+   ```
+Jeżeli wiersz poleceń zwrócił obecną wersję program rsync, konfiguracja przebiegła poprawnie.
+###6.	Uruchamianie testów
+Aby uruchomić testy aplikacji, uruchom wiersz linii komend w lokalizacji projektu a następnie wpisz:
+  ```
+mvn test  
+  ```
+W przypadku wyświetlenia komunikatu “BUILD SUCCESS” testy przebiegły pomyślnie i  aplikacja jest gotowa do uruchomienia.
+###7.	Uruchamianie aplikacji
+W celu uruchomienia aplikacji, otwórz dowolny wiersz poleceń w lokalizacji projektu i wpisz:
+  ```
+	mvn clean spring-boot:run  
+  ```
+Wpisanie wymienionych komendy spowoduje zbudowanie projektu, następnie usunięciu niepotrzebnych plików, by na końcu 
+uruchomić aplikację.
+###8.	Tworzenie pliku wykonawczego
+Aby utworzyć plik wykonawczy aplikacji serwera należy otworzyć wiersz poleceń w lokalizacji projektu, po czym wpisać:
+  ```
+mvn clean package spring-boot:repackage 
+   ```
+Spowoduje to utworzenie pliku wykonawczego file-synchronizer-server-1.0.0.jar w lokalizacji target/.
+###9.	Uruchamianie pliku wykonawczego
+Po poprawnym wykonaniu poleceń z poprzedniego podpunktu, należy uruchomić dowolny wiersz poleceń, odnaleźć utworzony 
+plik oraz wpisać:
+  ```
+java -jar file-synchronizer-SNAPSHOT.jar 
+  ```
+W przypadku niepowodzenia podczas uruchamiania aplikacji, zalecane jest ponowne przeprowadzenie konfiguracji.
+## Autor
 
-* **Paweł Jelonek** - *Initial work*
+* **Paweł Jelonek**
+
