@@ -1,4 +1,4 @@
-package com.licencjat.filesynchronizer.model.updatefiles;
+package pl.jelonek.filesynchronizer.server.model.updatefiles;
 
 
 import com.fasterxml.jackson.annotation.JsonInclude;

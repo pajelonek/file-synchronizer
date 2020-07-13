@@ -8,10 +8,10 @@
 		<version>2.2.5.RELEASE</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>com.licencjat</groupId>
-	<artifactId>file-synchronizer</artifactId>
-	<version>1.0.0-SNAPSHOT</version>
-	<name>file-synchronizer</name>
+	<groupId>pl.jelonek</groupId>
+	<artifactId>file-synchronizer-server</artifactId>
+	<version>1.0.0</version>
+	<name>file-synchronizer-server</name>
 	<description>File-synchronizer server</description>
 	<packaging>jar</packaging>
 
@@ -19,7 +19,7 @@
 		<java.version>1.8</java.version>
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
-		<start-class>com.licencjat.filesynchronizer.FileSynchronizerApplication</start-class>
+		<start-class>pl.jelonek.filesynchronizer.server.FileSynchronizerApplication</start-class>
 	</properties>
 
 	<dependencies>

@@ -1,12 +1,10 @@
-package com.licencjat.filesynchronizer.domain;
+package pl.jelonek.filesynchronizer.server.domain;
 
-import com.licencjat.filesynchronizer.model.updatefiles.FileLogger;
-import com.licencjat.filesynchronizer.model.updatefiles.LogFile;
-import com.licencjat.filesynchronizer.model.updatefiles.UpdateFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import pl.jelonek.filesynchronizer.server.model.updatefiles.*;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -65,6 +63,19 @@ public class FileChangesLogger {
         logFile.setAction(updateFile.getAction());
         return logFile;
     }
+
+    public ResponseEntity<UpdateFilesRS> registerFiles(UpdateFilesRQ updateFilesRQ) {
+        List<UpdateFile> updateFileList = updateFilesRQ.getUpdateFile();
+        UpdateFilesRS updateFilesRS = new UpdateFilesRS();
+        updateFilesRS.setStatus("ok");
+        if(!updateFileList.isEmpty()) {
+            for (UpdateFile updateFile : updateFileList) {
+                addLogFile(updateFile, updateFilesRQ.getHost());
+            }
+        }
+        return ResponseEntity.ok().body(updateFilesRS);
+    }
+
 
     public void cleanLogFileList() {
         logFileList = new ArrayList<>();

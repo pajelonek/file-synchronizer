@@ -1,11 +1,11 @@
-package com.licencjat.filesynchronizer.api;
+package pl.jelonek.filesynchronizer.server.api;
 
 
-import com.licencjat.filesynchronizer.domain.FileChangesLogger;
-import com.licencjat.filesynchronizer.domain.FileUpdaterService;
-import com.licencjat.filesynchronizer.model.updatefiles.FileLogger;
-import com.licencjat.filesynchronizer.model.updatefiles.UpdateFilesRQ;
-import com.licencjat.filesynchronizer.model.updatefiles.UpdateFilesRS;
+import pl.jelonek.filesynchronizer.server.domain.FileChangesLogger;
+import pl.jelonek.filesynchronizer.server.domain.FileUpdaterService;
+import pl.jelonek.filesynchronizer.server.model.updatefiles.FileLogger;
+import pl.jelonek.filesynchronizer.server.model.updatefiles.UpdateFilesRQ;
+import pl.jelonek.filesynchronizer.server.model.updatefiles.UpdateFilesRS;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -39,7 +39,7 @@ public class RestClientController {
 
     @PostMapping(value = "/registerFiles", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<UpdateFilesRS> registerFiles(@RequestBody UpdateFilesRQ updateFilesRQ) {
-        return fileUpdaterService.registerFiles(updateFilesRQ);
+        return fileChangesLogger.registerFiles(updateFilesRQ);
     }
 
     @PostMapping(value = "/removeFiles", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)

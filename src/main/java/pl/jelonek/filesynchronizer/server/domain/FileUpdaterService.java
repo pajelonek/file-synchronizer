@@ -1,9 +1,9 @@
-package com.licencjat.filesynchronizer.domain;
+package pl.jelonek.filesynchronizer.server.domain;
 
-import com.licencjat.filesynchronizer.model.updatefiles.UpdateFile;
-import com.licencjat.filesynchronizer.model.updatefiles.UpdateFileStatus;
-import com.licencjat.filesynchronizer.model.updatefiles.UpdateFilesRQ;
-import com.licencjat.filesynchronizer.model.updatefiles.UpdateFilesRS;
+import pl.jelonek.filesynchronizer.server.model.updatefiles.UpdateFile;
+import pl.jelonek.filesynchronizer.server.model.updatefiles.UpdateFileStatus;
+import pl.jelonek.filesynchronizer.server.model.updatefiles.UpdateFilesRQ;
+import pl.jelonek.filesynchronizer.server.model.updatefiles.UpdateFilesRS;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -66,18 +66,6 @@ public class FileUpdaterService {
         getFileListRS.setMainFolder(serverSshPath);
         getFileListRS.setUpdateFile(getServerFileList(serverDirectoryFullPath));
         return ResponseEntity.ok().body(getFileListRS);
-    }
-
-    public ResponseEntity<UpdateFilesRS> registerFiles(UpdateFilesRQ updateFilesRQ) {
-        List<UpdateFile> updateFileList = updateFilesRQ.getUpdateFile();
-        UpdateFilesRS updateFilesRS = new UpdateFilesRS();
-        updateFilesRS.setStatus("ok");
-        if(!updateFileList.isEmpty()) {
-            for (UpdateFile updateFile : updateFileList) {
-                fileChangesLogger.addLogFile(updateFile, updateFilesRQ.getHost());
-            }
-        }
-        return ResponseEntity.ok().body(updateFilesRS);
     }
 
     public ResponseEntity<UpdateFilesRS> removeFiles(UpdateFilesRQ updateFilesRQ) {

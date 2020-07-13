@@ -1,12 +1,12 @@
-package com.licencjat.filesynchronizer;
+package pl.jelonek.filesynchronizer.server;
 
 
-import com.licencjat.filesynchronizer.domain.FileChangesLogger;
-import com.licencjat.filesynchronizer.domain.FileUpdaterService;
-import com.licencjat.filesynchronizer.model.updatefiles.FileLogger;
-import com.licencjat.filesynchronizer.model.updatefiles.LogFile;
-import com.licencjat.filesynchronizer.model.updatefiles.UpdateFile;
-import com.licencjat.filesynchronizer.model.updatefiles.UpdateFilesRQ;
+import pl.jelonek.filesynchronizer.server.domain.FileChangesLogger;
+import pl.jelonek.filesynchronizer.server.domain.FileUpdaterService;
+import pl.jelonek.filesynchronizer.server.model.updatefiles.FileLogger;
+import pl.jelonek.filesynchronizer.server.model.updatefiles.LogFile;
+import pl.jelonek.filesynchronizer.server.model.updatefiles.UpdateFile;
+import pl.jelonek.filesynchronizer.server.model.updatefiles.UpdateFilesRQ;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -123,7 +123,7 @@ public class FileChangesLoggerTest {
 
         //given
         UpdateFilesRQ updateFilesRQ = createUpdateFilesRQSetTwo();
-        fileUpdaterService.registerFiles(updateFilesRQ);
+        fileChangesLogger.registerFiles(updateFilesRQ);
 
         //then
         ResponseEntity<FileLogger> fileLoggerResponseEntity = fileChangesLogger.getLogFileList();

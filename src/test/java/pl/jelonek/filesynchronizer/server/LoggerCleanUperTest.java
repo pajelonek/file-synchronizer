@@ -1,8 +1,8 @@
-package com.licencjat.filesynchronizer;
+package pl.jelonek.filesynchronizer.server;
 
-import com.licencjat.filesynchronizer.domain.FileChangesLogger;
-import com.licencjat.filesynchronizer.domain.LoggerCleanUper;
-import com.licencjat.filesynchronizer.model.updatefiles.LogFile;
+import pl.jelonek.filesynchronizer.server.domain.FileChangesLogger;
+import pl.jelonek.filesynchronizer.server.domain.LoggerCleanUper;
+import pl.jelonek.filesynchronizer.server.model.updatefiles.LogFile;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

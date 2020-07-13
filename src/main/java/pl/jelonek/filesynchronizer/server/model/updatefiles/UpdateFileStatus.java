@@ -1,5 +1,4 @@
-package com.licencjat.filesynchronizer.model.updatefiles;
-
+package pl.jelonek.filesynchronizer.server.model.updatefiles;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -7,20 +6,18 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
+        "status",
         "filePath",
         "lastModified",
-        "action"
 })
-public class UpdateFile {
+public class UpdateFileStatus {
 
     @JsonProperty("filePath")
     private String filePath;
-
+    @JsonProperty("status")
+    private String status;
     @JsonProperty("lastModified")
     private String lastModified;
-
-    @JsonProperty("action")
-    private String action;
 
     @JsonProperty("filePath")
     public String getFilePath() {
@@ -32,6 +29,16 @@ public class UpdateFile {
         this.filePath = filePath;
     }
 
+    @JsonProperty("status")
+    public String getStatus() {
+        return status;
+    }
+
+    @JsonProperty("status")
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
     @JsonProperty("lastModified")
     public String getLastModified() {
         return lastModified;
@@ -40,16 +47,6 @@ public class UpdateFile {
     @JsonProperty("lastModified")
     public void setLastModified(String lastModified) {
         this.lastModified = lastModified;
-    }
-
-    @JsonProperty("action")
-    public String getAction() {
-        return action;
-    }
-
-    @JsonProperty("action")
-    public void setAction(String action) {
-        this.action = action;
     }
 
 }

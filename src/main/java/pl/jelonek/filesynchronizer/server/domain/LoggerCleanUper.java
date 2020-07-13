@@ -1,6 +1,6 @@
-package com.licencjat.filesynchronizer.domain;
+package pl.jelonek.filesynchronizer.server.domain;
 
-import com.licencjat.filesynchronizer.model.updatefiles.LogFile;
+import pl.jelonek.filesynchronizer.server.model.updatefiles.LogFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;

@@ -1,10 +1,10 @@
-package com.licencjat.filesynchronizer;
+package pl.jelonek.filesynchronizer.server;
 
 import static org.junit.Assert.*;
 
-import com.licencjat.filesynchronizer.domain.FileChangesLogger;
-import com.licencjat.filesynchronizer.domain.FileUpdaterService;
-import com.licencjat.filesynchronizer.model.updatefiles.*;
+import pl.jelonek.filesynchronizer.server.domain.FileChangesLogger;
+import pl.jelonek.filesynchronizer.server.domain.FileUpdaterService;
+import pl.jelonek.filesynchronizer.server.model.updatefiles.*;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -169,43 +169,6 @@ public class FileUpdateServiceTest {
         assertTrue(result);
         fileChangesLogger.cleanLogFileList();
     }
-
-    @Test
-    public void setModificationDateTestSetTwo() {
-        //when
-        createResourcesFilesSetTwo();
-
-        //given
-        UpdateFilesRQ updateFilesRQ = createUpdateFilesRQSetTwo();
-        List<String> modificationDateList = fileUpdaterService.getServerFileList(userAbsolutePath + "\\testDirectory\\").stream()
-                .map(UpdateFile::getLastModified)
-                .collect(Collectors.toList());
-
-        //then
-        ResponseEntity<UpdateFilesRS> responseEntity = fileUpdaterService.registerFiles(updateFilesRQ);
-        assertEquals(responseEntity.getStatusCodeValue(), 200);
-        assertEquals(Objects.requireNonNull(responseEntity.getBody()).getUpdateFile().size(), setTwo.size());
-        assertEquals(responseEntity.getBody().getStatus(), "ok");
-        List<String> modificationDateListAfterRequest = responseEntity.getBody().getUpdateFile().stream()
-                .map(UpdateFileStatus::getLastModified)
-                .collect(Collectors.toList());
-
-        assertEquals(modificationDateListAfterRequest, modificationDateList);
-
-        boolean result = responseEntity.getBody().getUpdateFile().stream()
-                .allMatch(updateFileStatus -> updateFileStatus.getStatus().equals("OK"));
-        assertTrue(result);
-
-        List<LogFile> logFileList = Objects.requireNonNull(fileChangesLogger.getLogFileList().getBody()).getLogFileList();
-        List<String> setOneFromLogger = logFileList.stream()
-                .map(LogFile::getFilePath)
-                .collect(Collectors.toList());
-        assertEquals(setTwo, setOneFromLogger);
-        assertEquals(setTwo.size(), setOneFromLogger.size());
-
-        fileChangesLogger.cleanLogFileList();
-    }
-
 
     private void createResourcesFilesSetOne() {
         createSetOne();
