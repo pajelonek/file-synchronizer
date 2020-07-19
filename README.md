@@ -38,7 +38,8 @@ ustawienie wartości do swoich potrzeb.
 Do właściwości zdefiniowanych należą:
 -	server.absolute.path - ścieżka lokalna do folderu, który serwer traktuje jako miejsce przechowywania wspólnych 
 plików dla klientu. Do poprawnego działania rozwiązania, z powodu konfiguracji ssh, wymagane jest wybranie folderu 
-należącego do ścieżki użytkownika lokalnego komputera.
+należącego do ścieżki użytkownika lokalnego komputera. Aplikacja sama nie utworzy tego pliku a bez niego kolej kroki nie
+będą możliwe. Zalecane jest utworzenie go podczas konfiguracji pliku application-properties.
 -	server.ssh.path - ścieżka lokalna do folderu z perspektywy protokołu ssh. Jest to server.absolute.path skrócone o 
 początek C:/Users/Username.
 -	cleaning.log.file.interval - interwał w sekundach, który określa jak po ilu sekundach każda zmiana o modyfikacji
