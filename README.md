@@ -22,7 +22,7 @@ Jest to zwykły plik tekstowy, korzystający z wbudowanych właściwości pozwal
 logging.level.root = INFO  
 server.address = 0.0.0.0  
 server.port = 8888  
-server.absolute.path = C:\\Users\\Username\\randomDirectory\\serverFiles  
+server.absolute.path = /home/osboxes/serverFiles
 server.ssh.path = randomDirectory\\serverFiles  
 cleaning.log.file.interval = 120  
  ```
@@ -41,7 +41,7 @@ plików dla klientu. Do poprawnego działania rozwiązania, z powodu konfiguracj
 należącego do ścieżki użytkownika lokalnego komputera. Aplikacja sama nie utworzy tego pliku a bez niego kolej kroki nie
 będą możliwe. Zalecane jest utworzenie go podczas konfiguracji pliku application-properties.
 -	server.ssh.path - ścieżka lokalna do folderu z perspektywy protokołu ssh. Jest to server.absolute.path skrócone o 
-początek C:/Users/Username.
+początek /home/osboxes/.
 -	cleaning.log.file.interval - interwał w sekundach, który określa jak po ilu sekundach każda zmiana o modyfikacji
  pliku przez dowolnego klienta, zostaje skasowana. Zalecane jest pozostawienie domyślnej wartości.
 ###2.	Instalacja zależności
@@ -55,6 +55,9 @@ informacje co ma zainstalować.
 Jeżeli na ekranie wyświetli się informacja “BUILD SUCCESS”, oznacza to poprawność instalacji zasobów z sieci i możliwość
  przejścia do kolejnych kroków konfiguracyjnych.
 ###3.	Konfiguracja OpenSSH Server
+####Linux
+W przypadku systemow Linux nie jest wymagana zadna akcja.
+####Windows
 Po stronie aplikacji serwerowej wymagana jest obecność skonfigurowania serwera ssh. Autor sugeruje wykorzystać wbudowaną
  opcję systemu instalacji OpenSSH Server. Aby go zainstalować:
 -	Otwórz menu Start
@@ -72,7 +75,8 @@ Następnie należy wyszukać usługę “OpenSSH Server” z dostępnej listy. W
 oraz z listy rozwijanej “Opcje uruchamiania” wybrać “Automatyczne”.
 ###4.	Stwórz plik authorized_keys
 Kolejnym krokiem jest utworzenie folderu “.ssh” w folderze użytkownika stacji roboczej tj. 
-C:/Użytkownicy/Nazwa_Użytkownika/.ssh.
+/home/username/chosenFolder/.ssh.
+####Windows
 Następnie otwórz dowolny edytor plików, utwórz plik bez rozszerzenia i nazwij go “authorized_keys”. Będzie on 
 odpowiedzialny za przechowywanie kluczy publicznych. Wspomniany przez autora plik musi znajdować się w wcześniej 
 utworzonym folderze “.ssh”.
@@ -86,11 +90,27 @@ W tym celu:
 5.	Usuń dostęp wszystkich użytkowników z wyjątkiem użytkownika “System” oraz użytkownika obecnie zalogowanego
 6.	Naciśnij przycisk “Zastosuj”
 Po ustawieniu poprawnych zabezpieczeń, można bezpiecznie przesyłać klucze publiczne z klientów do pliku “authorized_keys”.
+####Linux
+W przypadku systemow Linux, uda sie do twojego lokalnego folderu .ssh i nastepnie utworz pusty plik "authorized_keys".
+Przykladowo:
+```
+touch authorized_keys
+```
+i pamietaj o domyslnych ustawieniach plikow ssh:
+ - chmod 700 ~/.ssh
+ - chmod 644 ~/.ssh/authorized_keys
+ - chmod 644 ~/.ssh/known_hosts
+ - chmod 644 ~/.ssh/config
+ - chmod 600 ~/.ssh/id_rsa
+ - chmod 644 ~/.ssh/id_rsa.pub
 ###5.	Konfiguracja rsync
+####Windows
 W rozwiązaniu, jednym z założeń komunikacyjnych jest dostęp stacji roboczej z aplikacją serwera, do programu rsync. W 
 tym celu autor umieścił pliki binarne programu rsync z dystrybucji Cygwina pod ścieżką src/main/java/resources/bin.zip.
 Wybierz dowolną wolną lokalizację, wypakuj tam wspomniane pliki rsync a następnie dodaj tę ścieżkę do zmiennych 
 środowiskowych systemu.
+#Linux
+Rsync jest domsylnie wbudowany w systemy Linux. Nie jest wymagana zadna akcja.
 Aby zweryfikować poprawność dodawania zmiennej, otwórz wiersz linii komend i wpisz:
   ```
 	rsync --version  
