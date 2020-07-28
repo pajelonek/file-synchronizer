@@ -22,8 +22,8 @@ Jest to zwykły plik tekstowy, korzystający z wbudowanych właściwości pozwal
 logging.level.root = INFO  
 server.address = 0.0.0.0  
 server.port = 8888  
-server.absolute.path = /home/osboxes/serverFiles
-server.ssh.path = randomDirectory\\serverFiles  
+server.absolute.path = /home/osboxes/directory/serverFiles
+server.ssh.path = directory/serverFiles
 cleaning.log.file.interval = 120  
  ```
 Przedstawiony fragment kodu przedstawia plik należący do rozwiązania wchodzącego w skład kodu źródłowego.
@@ -40,8 +40,8 @@ Do właściwości zdefiniowanych należą:
 plików dla klientu. Do poprawnego działania rozwiązania, z powodu konfiguracji ssh, wymagane jest wybranie folderu 
 należącego do ścieżki użytkownika lokalnego komputera. Aplikacja sama nie utworzy tego pliku a bez niego kolej kroki nie
 będą możliwe. Zalecane jest utworzenie go podczas konfiguracji pliku application-properties.
--	server.ssh.path - ścieżka lokalna do folderu z perspektywy protokołu ssh. Jest to server.absolute.path skrócone o 
-początek /home/osboxes/.
+-	server.ssh.path - ścieżka lokalna do folderu z perspektywy protokołu ssh. Na przykadzie jest to server.absolute.path
+ skrócone o początek /home/osboxes/.
 -	cleaning.log.file.interval - interwał w sekundach, który określa jak po ilu sekundach każda zmiana o modyfikacji
  pliku przez dowolnego klienta, zostaje skasowana. Zalecane jest pozostawienie domyślnej wartości.
 ###2.	Instalacja zależności
