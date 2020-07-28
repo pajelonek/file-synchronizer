@@ -56,7 +56,7 @@ Jeżeli na ekranie wyświetli się informacja “BUILD SUCCESS”, oznacza to po
  przejścia do kolejnych kroków konfiguracyjnych.
 ###3.	Konfiguracja OpenSSH Server
 ####Linux
-W przypadku systemow Linux nie jest wymagana zadna akcja.
+W przypadku systemów Linux nie jest wymagana żadna akcja ponieważ OpenSSH jest domyślnie zintegrowane.
 ####Windows
 Po stronie aplikacji serwerowej wymagana jest obecność skonfigurowania serwera ssh. Autor sugeruje wykorzystać wbudowaną
  opcję systemu instalacji OpenSSH Server. Aby go zainstalować:
@@ -75,7 +75,7 @@ Następnie należy wyszukać usługę “OpenSSH Server” z dostępnej listy. W
 oraz z listy rozwijanej “Opcje uruchamiania” wybrać “Automatyczne”.
 ###4.	Stwórz plik authorized_keys
 Kolejnym krokiem jest utworzenie folderu “.ssh” w folderze użytkownika stacji roboczej tj. 
-/home/username/chosenFolder/.ssh.
+/home/username/.ssh w przypadku jego nieistnienia.
 ####Windows
 Następnie otwórz dowolny edytor plików, utwórz plik bez rozszerzenia i nazwij go “authorized_keys”. Będzie on 
 odpowiedzialny za przechowywanie kluczy publicznych. Wspomniany przez autora plik musi znajdować się w wcześniej 
@@ -91,12 +91,12 @@ W tym celu:
 6.	Naciśnij przycisk “Zastosuj”
 Po ustawieniu poprawnych zabezpieczeń, można bezpiecznie przesyłać klucze publiczne z klientów do pliku “authorized_keys”.
 ####Linux
-W przypadku systemow Linux, uda sie do twojego lokalnego folderu .ssh i nastepnie utworz pusty plik "authorized_keys".
+W przypadku systemów Linux, udaj się do twojego lokalnego folderu .ssh i następnie utwórz pusty plik "authorized_keys".
 Przykladowo:
 ```
 touch authorized_keys
 ```
-i pamietaj o domyslnych ustawieniach plikow ssh:
+i pamiętaj o domyślnych ustawieniach plików ssh:
  - chmod 700 ~/.ssh
  - chmod 644 ~/.ssh/authorized_keys
  - chmod 644 ~/.ssh/known_hosts
@@ -110,12 +110,16 @@ tym celu autor umieścił pliki binarne programu rsync z dystrybucji Cygwina pod
 Wybierz dowolną wolną lokalizację, wypakuj tam wspomniane pliki rsync a następnie dodaj tę ścieżkę do zmiennych 
 środowiskowych systemu.
 #Linux
-Rsync jest domsylnie wbudowany w systemy Linux. Nie jest wymagana zadna akcja.
-Aby zweryfikować poprawność dodawania zmiennej, otwórz wiersz linii komend i wpisz:
+Rsync jest domyślnie wbudowany w systemy Linux. Nie jest wymagana żadna akcja.
+Aby zweryfikować istnienia narzędzie na maszynie wpisz:
   ```
 	rsync --version  
    ```
-Jeżeli wiersz poleceń zwrócił obecną wersję program rsync, konfiguracja przebiegła poprawnie.
+Jeżeli wiersz poleceń zwrócił obecną wersję program rsync, konfiguracja przebiegła poprawnie. W przeciwnym wypadku 
+zainstaluj narzędzie korzystając z komendy:
+```
+apt-get install rsync
+```
 ###6.	Uruchamianie testów
 Aby uruchomić testy aplikacji, uruchom wiersz linii komend w lokalizacji projektu a następnie wpisz:
   ```
