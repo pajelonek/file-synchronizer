@@ -162,7 +162,8 @@ public class FileUpdateServiceTest {
         List<String> setTwoFromResponse = updateFileList.stream()
                 .map(UpdateFile::getFilePath).collect(Collectors.toList());
 
-        assertEquals(setTwo, setTwoFromResponse);
+        boolean resultSetTwo = setTwo.containsAll(setTwoFromResponse);
+        assertTrue(resultSetTwo);
         assertFalse(updateFileList.isEmpty());
 
         boolean result = updateFileList.stream().allMatch(file -> Long.parseLong(file.getLastModified()) > 0);
@@ -181,7 +182,11 @@ public class FileUpdateServiceTest {
 
             for (String filePath : setOne) {
                 File file = new File(userAbsolutePath + filePath);
-                FileUtils.touch(file);
+                if(!file.exists()) {
+                    if (file.createNewFile()) {
+                        logger.info("Directory already exist");
+                    } else throw new Error("Could not create directory, check permissions");
+                }
                 file.deleteOnExit();
             }
 
@@ -214,7 +219,11 @@ public class FileUpdateServiceTest {
 
             for (String filePath : setTwo) {
                 File file = new File(userAbsolutePath + filePath);
-                FileUtils.touch(file);
+                if(!file.exists()) {
+                    if (file.createNewFile()) {
+                        logger.info("Directory already exist");
+                    } else throw new Error("Could not create directory, check permissions");
+                }
                 file.deleteOnExit();
             }
 
@@ -225,10 +234,10 @@ public class FileUpdateServiceTest {
 
     private void createSetTwo() {
         setTwo = new ArrayList<>();
-        setTwo.add("\\testDirectory\\fileOne.txt");
-        setTwo.add("\\testDirectory\\fileTwo.txt");
-        setTwo.add("\\testDirectory\\SubDirectory\\FileOne.txt");
-        setTwo.add("\\testDirectory\\SubDirectory\\FileTwo.txt");
+        setTwo.add("/testDirectory/fileOne.txt");
+        setTwo.add("/testDirectory/fileTwo.txt");
+        setTwo.add("/testDirectory/SubDirectory/FileOne.txt");
+        setTwo.add("/testDirectory/SubDirectory/FileTwo.txt");
     }
 
     private void createSetTwoDirectoryList() {
@@ -286,3 +295,4 @@ public class FileUpdateServiceTest {
 
     }
 }
+
